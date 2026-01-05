@@ -1,0 +1,69 @@
+{
+  "posts": [
+    {
+      "slug": "how-to-read-a-paper",
+      "date": "2025-01-05",
+      "tags": [
+        "research",
+        "methodology",
+        "reading"
+      ],
+      "versions": {
+        "original": {
+          "title": "How to Read a Paper",
+          "summary": "A personal guide on reading academic papers effectively, focusing on insights and active thinking.",
+          "file": "posts/how-to-read-a-paper.md"
+        }
+      }
+    },
+    {
+      "slug": "vision-transformer",
+      "date": "2025-01-04",
+      "tags": [
+        "deep-learning",
+        "vision",
+        "transformer",
+        "architecture"
+      ],
+      "versions": {
+        "original": {
+          "title": "Vision Transformer",
+          "summary": "From first principles - what symmetry does ViT encode, and when does it beat CNNs?",
+          "file": "posts/vision-transformer.md"
+        }
+      }
+    },
+    {
+      "slug": "information-theory-foundations",
+      "date": "2025-01-03",
+      "tags": [
+        "information-theory",
+        "math",
+        "foundations"
+      ],
+      "versions": {
+        "original": {
+          "title": "Foundations of Information Theory",
+          "summary": "Self-information, entropy, mutual information, and KL divergence — the core concepts.",
+          "file": "posts/information-theory-foundations.md"
+        }
+      }
+    }
+  ],
+  "languages": [
+    "original"
+  ],
+  "tags": [
+    "architecture",
+    "deep-learning",
+    "foundations",
+    "information-theory",
+    "math",
+    "methodology",
+    "reading",
+    "research",
+    "transformer",
+    "vision"
+  ],
+  "generated_at": "2026-01-05T08:30:09.074035"
+}

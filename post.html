@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Navigator (3D Tilted Sidebar) -->
+    <nav class="navigator" id="navigator">
+      <div class="nav-section">
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+          </a>
+          <a href="index.html#posts" class="nav-link active">
+            <span class="nav-icon">✎</span>
+            <span>Blog</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-lang" id="lang-switcher">
+          <button class="lang-btn active" data-lang="original">X</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="zh">中</button>
+          <button class="lang-btn" data-lang="ja">日</button>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-history">
+          <button class="history-btn" onclick="history.back()">←</button>
+          <button class="history-btn" onclick="history.forward()">→</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+      <span class="menu-icon"></span>
+    </button>
+
+    <!-- Overlay for mobile -->
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Post Content -->
+      <article class="post-page">
+        <header class="post-page-header">
+          <h1 class="post-page-title" id="post-title">Loading...</h1>
+          <div class="post-page-meta" id="post-meta"></div>
+          <div class="post-page-tags" id="post-tags"></div>
+          <div class="post-lang-switcher" id="post-lang-switcher"></div>
+        </header>
+        <div class="post-content" id="post-content"></div>
+      </article>
+
+      <!-- Footer -->
+      <footer class="footer">
+        &copy; 2025
+      </footer>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="js/post.js"></script>
+</body>
+</html>

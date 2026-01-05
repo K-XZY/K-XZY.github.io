@@ -1,0 +1,100 @@
+# =============================================================================
+# 个人信息配置
+# build.py 会将此文件转换为 config.json 供前端使用
+#
+# 多语言 fallback 规则：如果某语言字段为空，前端会依次尝试 original → en
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 网站设置
+# -----------------------------------------------------------------------------
+site:
+  default_lang: "original"  # 默认显示语言: original / en / zh / ja
+  languages: ["original", "en", "zh", "ja"]  # 网站支持的所有语言
+  title:
+    original: "Kevin Xie"
+    en: "Kevin Xie"
+    zh: "谢子阳"
+    ja: "ケビン・シェ"
+
+# -----------------------------------------------------------------------------
+# 个人资料
+# -----------------------------------------------------------------------------
+profile:
+  name:
+    original: "Kevin (子阳) Xie"
+    en: "Kevin (Ziyang) Xie"
+    zh: "谢子阳"
+    ja: "ケビン・シェ"
+
+  photo: "photos/Kevin Xie.jpeg"  # 头像路径（相对于 website/）
+
+  tagline:  # 一句话介绍
+    original: "MEng Student @ UCL | AI & Robotics"
+    en: "MEng Student @ UCL | AI & Robotics"
+    zh: "伦敦大学学院硕士生 | 人工智能与机器人"
+    ja: "UCL修士課程 | AI・ロボティクス"
+
+  bio:  # 简短自我介绍（首页显示）
+    original: |
+      I'm interested in building intelligent systems that learn efficiently
+      and adapt continuously. Currently exploring self-supervised learning,
+      continual learning, and paths toward AGI.
+
+      I believe the best ideas emerge at the intersection of deep technical
+      understanding and real-world impact. Always looking for problems
+      worth solving and people worth solving them with.
+    zh: |
+      我对构建高效学习、持续适应的智能系统充满热情。目前专注于自监督学习、
+      持续学习，以及通往通用人工智能的道路。
+
+      我相信最好的想法诞生于技术深度与现实影响力的交汇处。
+      一直在寻找值得解决的问题，以及值得一起解决问题的人。
+    ja: |
+      効率的に学習し、継続的に適応するインテリジェントシステムの構築に
+      興味があります。現在は自己教師あり学習、継続学習、AGIへの道を探求中。
+
+      技術的深さと現実世界へのインパクトの交差点で、最高のアイデアが
+      生まれると信じています。解決すべき問題と、共に解決する仲間を探しています。
+
+# -----------------------------------------------------------------------------
+# 社交链接（留空则不显示）
+# -----------------------------------------------------------------------------
+links:
+  email: "kevin.xie.23@ucl.ac.uk"  # TODO: anti-bot protection
+  github: "https://github.com/kevinxie"  # 替换为你的
+  linkedin: "https://linkedin.com/in/kevinxie"  # 替换为你的
+  # google_scholar: ""
+  # twitter: ""
+
+# -----------------------------------------------------------------------------
+# 教育经历
+# -----------------------------------------------------------------------------
+education:
+  - institution:
+      en: "University College London"
+      zh: "伦敦大学学院"
+      ja: "ユニバーシティ・カレッジ・ロンドン"
+    degree:
+      en: "MEng Robotics and Artificial Intelligence"
+      zh: "机器人与人工智能工学硕士"
+      ja: "ロボティクス・AI工学修士"
+    year: "2023 - 2027"
+
+# -----------------------------------------------------------------------------
+# 研究兴趣
+# 只需填 original，其他语言可选（空则 fallback 到 original）
+# -----------------------------------------------------------------------------
+research_interests:
+  - original: "Self-Supervised Learning"
+    zh: "自监督学习"
+    ja: "自己教師あり学習"
+  - original: "Continual Learning"
+    zh: "持续学习"
+    ja: "継続学習"
+  - original: "Algorithmic Efficiency"
+    zh: "算法效率"
+    ja: "アルゴリズム効率"
+  - original: "Artificial General Intelligence"
+    zh: "通用人工智能"
+    ja: "汎用人工知能"

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JadeRegent — Refined</title>
+  <style>
+    :root {
+      --void: #080a08;
+      --surface: #0b0d0b;
+      --elevated: #0e100e;
+
+      --line: rgba(255, 255, 255, 0.06);
+      --line-hover: rgba(255, 255, 255, 0.1);
+
+      --accent: #a08c5b;
+      --jade: #1a2e1a;
+      --jade-light: #243824;
+      --jade-bright: #39ff14;
+
+      --text-primary: #f5f5f5;
+      --text-secondary: #999;
+      --text-tertiary: #666;
+      --text-quaternary: #444;
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      --font-mono: "SF Mono", "Fira Code", monospace;
+
+      --radius: 3px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--void);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==================== Layout ==================== */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ==================== Navigator ==================== */
+    .navigator {
+      position: fixed;
+      left: calc(32px + 10%);
+      top: 50%;
+      transform: translateY(-50%) perspective(800px) rotateY(8deg) scale(1.25);
+      transform-origin: left center;
+      width: 180px;
+
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+
+      padding: 28px 0;
+
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.5),
+        0 20px 50px -20px rgba(0,0,0,0.5),
+        8px 0 24px -8px rgba(0,0,0,0.3);
+
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .nav-section {
+      padding: 0 24px;
+    }
+
+    .nav-section + .nav-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin: 0 -14px;
+
+      color: var(--text-tertiary);
+      text-decoration: none;
+      font-size: 14px;
+      border-radius: var(--radius);
+
+      transition: all 0.15s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-secondary);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .nav-link.active {
+      color: var(--text-primary);
+    }
+
+    .nav-icon {
+      width: 20px;
+      text-align: center;
+      font-size: 15px;
+      opacity: 0.5;
+    }
+
+    .nav-link:hover .nav-icon,
+    .nav-link.active .nav-icon {
+      opacity: 0.8;
+    }
+
+    .nav-lang {
+      display: flex;
+      gap: 6px;
+    }
+
+    .lang-btn {
+      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-quaternary);
+      font-size: 12px;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: all 0.15s;
+    }
+
+    .lang-btn:hover {
+      color: var(--text-tertiary);
+    }
+
+    .lang-btn.active {
+      color: var(--text-secondary);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .nav-history {
+      display: flex;
+      gap: 10px;
+    }
+
+    .history-btn {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text-quaternary);
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: all 0.15s;
+    }
+
+    .history-btn:hover {
+      color: var(--text-tertiary);
+      border-color: var(--line-hover);
+    }
+
+    /* ==================== Main ==================== */
+    .main {
+      margin-left: auto;
+      margin-right: 10%;
+      padding: 72px 64px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    /* ==================== About ==================== */
+    .about {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 40px;
+      padding-left: 140px;
+      padding-bottom: 48px;
+      margin-bottom: 56px;
+      margin-left: 40px;
+      overflow: visible;
+    }
+
+    .about::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--jade-light);
+      transition: background 0.3s ease;
+    }
+
+    .about:hover::after {
+      background: var(--jade-bright);
+    }
+
+    .about:has(.avatar:hover)::after {
+      background: var(--jade-light);
+    }
+
+    .about-inner {
+      display: flex;
+      gap: 32px;
+    }
+
+    .avatar {
+      position: absolute;
+      left: -40px;
+      top: -24px;
+      width: 140px;
+      height: 140px;
+      background: var(--elevated);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-tertiary);
+      font-size: 48px;
+      font-weight: 300;
+      flex-shrink: 0;
+      box-shadow: 0 8px 32px -8px rgba(0,0,0,0.5);
+      z-index: 1;
+    }
+
+    .avatar::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--jade-light);
+      transition: background 0.3s ease;
+    }
+
+    .avatar:hover::after {
+      background: var(--jade-bright);
+    }
+
+    .about-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-quaternary);
+      margin-bottom: 8px;
+    }
+
+    .name {
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .tagline {
+      font-size: 15px;
+      color: var(--text-tertiary);
+      margin-bottom: 20px;
+    }
+
+    .bio {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .links a {
+      font-size: 14px;
+      color: var(--text-tertiary);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .links a:hover {
+      color: var(--text-primary);
+    }
+
+    /* ==================== Search ==================== */
+    .search-section {
+      margin-bottom: 48px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-size: 15px;
+      font-family: var(--font-sans);
+      transition: border-color 0.15s;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-quaternary);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--line-hover);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      padding: 8px 14px;
+      background: transparent;
+      border: none;
+      color: var(--text-quaternary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tag:hover {
+      color: var(--text-tertiary);
+    }
+
+    .tag.active {
+      color: var(--text-secondary);
+    }
+
+    /* ==================== Posts ==================== */
+    .posts-header {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-quaternary);
+      margin-bottom: 20px;
+    }
+
+    .posts-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .post {
+      display: block;
+      text-decoration: none;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--line);
+      transition: all 0.15s, border-bottom-color 0.3s ease;
+    }
+
+    .post:first-child {
+      border-top: 1px solid var(--line);
+    }
+
+    .post:hover {
+      background: linear-gradient(90deg, rgba(255,255,255,0.015), transparent 50%);
+      padding-left: 20px;
+      margin-left: -20px;
+      padding-right: 20px;
+      margin-right: -20px;
+      border-bottom-color: var(--jade-bright);
+    }
+
+    .post-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      transition: color 0.15s;
+    }
+
+    .post:hover .post-title {
+      color: var(--accent);
+    }
+
+    .post-meta {
+      font-size: 13px;
+      font-family: var(--font-mono);
+      color: var(--text-quaternary);
+      margin-bottom: 10px;
+    }
+
+    .post-summary {
+      font-size: 15px;
+      color: var(--text-tertiary);
+      line-height: 1.65;
+    }
+
+    .post-tags {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .post-tag {
+      font-size: 12px;
+      color: var(--text-quaternary);
+    }
+
+    /* ==================== Footer ==================== */
+    .footer {
+      margin-top: 56px;
+      padding-top: 28px;
+      font-size: 13px;
+      color: var(--text-quaternary);
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav class="navigator" id="navigator">
+      <div class="nav-section">
+        <div class="nav-links">
+          <a href="#" class="nav-link active">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+          </a>
+          <a href="#" class="nav-link">
+            <span class="nav-icon">✎</span>
+            <span>Blog</span>
+          </a>
+          <a href="#" class="nav-link">
+            <span class="nav-icon">◉</span>
+            <span>CV</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-lang">
+          <button class="lang-btn active">原</button>
+          <button class="lang-btn">EN</button>
+          <button class="lang-btn">中</button>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-history">
+          <button class="history-btn">←</button>
+          <button class="history-btn">→</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main">
+      <section class="about">
+        <div class="about-inner">
+          <div class="avatar">K</div>
+          <div class="about-content">
+            <div class="label">About</div>
+            <h1 class="name">Kevin (Ziyang) Xie</h1>
+            <p class="tagline">MEng Student @ UCL | AI & Robotics</p>
+            <p class="bio">
+              I'm interested in building intelligent systems that learn efficiently and adapt continuously. Currently exploring self-supervised learning, continual learning, and paths toward AGI. I believe the best ideas emerge at the intersection of deep technical understanding and real-world impact.
+            </p>
+            <div class="links">
+              <a href="#">GitHub</a>
+              <a href="#">LinkedIn</a>
+              <a href="#">Email</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="search-section">
+        <input type="text" class="search-input" placeholder="Search posts...">
+        <div class="tags">
+          <span class="tag active">all</span>
+          <span class="tag">research</span>
+          <span class="tag">methodology</span>
+          <span class="tag">deep-learning</span>
+          <span class="tag">information-theory</span>
+        </div>
+      </section>
+
+      <section class="posts-section">
+        <div class="posts-header">Posts</div>
+        <div class="posts-list">
+          <a href="#" class="post">
+            <div class="post-title">How to Read a Paper</div>
+            <div class="post-meta">Dec 15, 2024</div>
+            <p class="post-summary">
+              A personal guide on reading academic papers effectively. Three-pass approach and practical tips for getting the most out of research literature.
+            </p>
+            <div class="post-tags">
+              <span class="post-tag">research</span>
+              <span class="post-tag">methodology</span>
+            </div>
+          </a>
+
+          <a href="#" class="post">
+            <div class="post-title">JEPA: Joint Embedding Predictive Architecture</div>
+            <div class="post-meta">Dec 10, 2024</div>
+            <p class="post-summary">
+              Notes on Yann LeCun's vision for self-supervised learning and world models. How prediction in latent space might be the key to more capable AI systems.
+            </p>
+            <div class="post-tags">
+              <span class="post-tag">deep-learning</span>
+              <span class="post-tag">self-supervised</span>
+            </div>
+          </a>
+
+          <a href="#" class="post">
+            <div class="post-title">Information Theory Foundations</div>
+            <div class="post-meta">Dec 5, 2024</div>
+            <p class="post-summary">
+              Entropy, mutual information, KL divergence, and their applications in machine learning. The mathematical language of information.
+            </p>
+            <div class="post-tags">
+              <span class="post-tag">information-theory</span>
+              <span class="post-tag">mathematics</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <footer class="footer">
+        &copy; 2025
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const nav = document.getElementById('navigator');
+    const baseRotateY = 8; // Base tilt toward content
+
+    document.addEventListener('mousemove', e => {
+      const rect = nav.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      const dx = (e.clientX - cx) / window.innerWidth;
+      const dy = (e.clientY - cy) / window.innerHeight;
+
+      const rx = dy * -2;
+      const ry = baseRotateY + dx * 3;
+
+      nav.style.transform = `translateY(-50%) perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.25)`;
+    });
+  </script>
+</body>
+</html>

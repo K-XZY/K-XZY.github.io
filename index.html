@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Navigator (3D Tilted Sidebar) -->
+    <nav class="navigator" id="navigator">
+      <div class="nav-section">
+        <div class="nav-links">
+          <a href="#about" class="nav-link active" data-section="about">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+          </a>
+          <a href="#posts" class="nav-link" data-section="posts">
+            <span class="nav-icon">✎</span>
+            <span>Blog</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-lang" id="lang-switcher">
+          <button class="lang-btn active" data-lang="original">X</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="zh">中</button>
+          <button class="lang-btn" data-lang="ja">日</button>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-history">
+          <button class="history-btn" onclick="history.back()">←</button>
+          <button class="history-btn" onclick="history.forward()">→</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+      <span class="menu-icon"></span>
+    </button>
+
+    <!-- Overlay for mobile -->
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- About Section -->
+      <section class="about" id="about">
+        <div class="avatar" id="avatar">K</div>
+        <div class="about-inner">
+          <div class="about-content">
+            <div class="label">About</div>
+            <h1 class="name" id="profile-name">Kevin (Ziyang) Xie</h1>
+            <p class="tagline" id="profile-tagline">MEng Student @ UCL | AI & Robotics</p>
+            <p class="bio" id="profile-bio">Loading...</p>
+            <div class="links" id="social-links"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Search & Filter -->
+      <section class="search-section">
+        <input type="text" class="search-input" id="search-input" placeholder="Search posts...">
+        <div class="tags" id="tags-container"></div>
+      </section>
+
+      <!-- Posts Section -->
+      <section class="posts-section" id="posts">
+        <div class="posts-header">Posts</div>
+        <div class="posts-list" id="posts-list"></div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        &copy; 2025
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
