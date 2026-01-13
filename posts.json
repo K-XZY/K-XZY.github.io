@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "slug": "exploring-jepa-sigreg",
+      "date": "2026-01-13",
+      "tags": [
+        "deep-learning",
+        "self-supervised",
+        "representation-learning",
+        "JEPA"
+      ],
+      "versions": {
+        "original": {
+          "title": "Exploring JEPA and SIGReg",
+          "summary": "Reproducing LeJEPA on CIFAR-100 with ViT-nano — understanding SIGReg regularization and attention patterns.",
+          "file": "posts/exploring-jepa-sigreg.md"
+        }
+      }
+    },
+    {
       "slug": "how-to-read-a-paper",
       "date": "2025-01-05",
       "tags": [
@@ -54,6 +71,7 @@
     "original"
   ],
   "tags": [
+    "JEPA",
     "architecture",
     "deep-learning",
     "foundations",
@@ -61,9 +79,11 @@
     "math",
     "methodology",
     "reading",
+    "representation-learning",
     "research",
+    "self-supervised",
     "transformer",
     "vision"
   ],
-  "generated_at": "2026-01-05T08:30:09.074035"
+  "generated_at": "2026-01-13T02:09:33.145636"
 }
