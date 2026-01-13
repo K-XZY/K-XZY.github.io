@@ -217,10 +217,26 @@ summary: A personal guide on reading academic papers.
 
 ## 工作流程
 
+### Git 仓库
+
+本网站有独立的 Git 仓库，与 research-notes 父目录分开管理：
+
 ```bash
-# 发布新文章
+# 网站仓库
+origin: git@github.com:K-XZY/kevinxie-website.git
+
+# 注意：不要 push 到父目录的 research-notes repo
+```
+
+### 发布流程
+
+```bash
+# 1. 发布新文章
 python build.py
-git add . && git commit -m "Add new post" && git push
+
+# 2. 提交并推送到网站仓库
+cd Presentation/website
+git add . && git commit -m "Add new post" && git push origin main
 
 # 本地预览
 python -m http.server 8000
