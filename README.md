@@ -113,14 +113,14 @@
 
 ## 技术选型
 
-| 技术          | 选择                         | 理由                    |
-| ------------- | ---------------------------- | ----------------------- |
-| 前端          | HTML + CSS + JavaScript      | 纯静态，简单可控        |
-| 内容格式      | **HTML**                     | 直接控制，支持复杂交互  |
-| 数学公式      | KaTeX                        | 比 MathJax 更快         |
-| 图表可视化    | Chart.js / D3.js             | 交互式数据可视化        |
-| 索引生成      | Python 脚本 (build.py)       | 扫描 HTML 生成 posts.json |
-| 部署          | GitHub Pages                 | 免费、简单              |
+| 技术       | 选择                    | 理由                      |
+| ---------- | ----------------------- | ------------------------- |
+| 前端       | HTML + CSS + JavaScript | 纯静态，简单可控          |
+| 内容格式   | **HTML**                | 直接控制，支持复杂交互    |
+| 数学公式   | KaTeX                   | 比 MathJax 更快           |
+| 图表可视化 | Chart.js / D3.js        | 交互式数据可视化          |
+| 索引生成   | Python 脚本 (build.py)  | 扫描 HTML 生成 posts.json |
+| 部署       | GitHub Pages            | 免费、简单                |
 
 ---
 
@@ -407,3 +407,29 @@ python build.py
 - ✅ 只有 `.html` 文件会被索引
 - ✅ `.md` 文件会被忽略（可用作个人草稿）
 - ✅ 网站内容完全来自 HTML 文件
+
+
+---
+
+## SEO Optimization
+
+### Implemented
+- [x] Google Site Verification meta tag
+
+### Quick Wins (To Implement)
+1. **Meta descriptions**: Add description meta tags to all pages for better search result snippets.
+2. **Structured data**: Implement Schema.org JSON-LD for Article and Person types to enable rich snippets.
+3. **Page titles**: Optimize title tags with keywords and branding (e.g., "Post Title | Kevin Xie's Research Blog").
+4. **Open Graph tags**: Add OG meta tags for better social media link previews on Twitter, LinkedIn, etc.
+5. **Sitemap.xml**: Generate XML sitemap listing all pages to help search engines discover content.
+6. **robots.txt**: Create robots.txt file to guide search engine crawlers and reference sitemap.
+
+### Content SEO
+- Add alt text to all images for accessibility and image search
+- Implement internal linking between related posts
+- Consider adding canonical URLs to prevent duplicate content issues
+
+### Monitoring
+- Frequently update and check with Google Search Console
+- Monitor indexing status and search performance
+- Track click-through rates and adjust meta descriptions accordingly
