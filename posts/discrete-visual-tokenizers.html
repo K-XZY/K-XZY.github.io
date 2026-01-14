@@ -75,6 +75,14 @@
         </div>
       </div>
       <div class="nav-section">
+        <div class="nav-lang" id="lang-switcher">
+          <button class="lang-btn active" data-lang="original">X</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="zh">中</button>
+          <button class="lang-btn" data-lang="ja">日</button>
+        </div>
+      </div>
+      <div class="nav-section">
         <div class="nav-history">
           <button class="history-btn" id="prev-post" title="Previous post">&larr;</button>
           <button class="history-btn" id="next-post" title="Next post">&rarr;</button>
@@ -311,6 +319,54 @@
       overlay.classList.remove('active');
       document.body.style.overflow = '';
     });
+
+    // Language switching
+    const langSwitcher = document.getElementById('lang-switcher');
+
+    // Inject tooltips into language buttons
+    if (langSwitcher) {
+      const langLabels = {
+        'original': 'Original',
+        'en': 'English',
+        'zh': '中文',
+        'ja': '日本語',
+        'ko': '한국語',
+        'mixed': 'Mixed'
+      };
+
+      langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
+        const lang = btn.dataset.lang;
+        if (lang && langLabels[lang] && !btn.querySelector('.lang-tooltip')) {
+          const tooltip = document.createElement('span');
+          tooltip.className = 'lang-tooltip';
+          tooltip.textContent = langLabels[lang];
+          btn.appendChild(tooltip);
+        }
+      });
+    }
+    langSwitcher?.addEventListener('click', (e) => {
+      if (e.target.classList.contains('lang-btn')) {
+        const lang = e.target.dataset.lang;
+        document.body.className = 'lang-' + lang;
+
+        // Update button states
+        langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+
+        // Save preference
+        localStorage.setItem('post-lang', lang);
+      }
+    });
+
+    // Restore saved language
+    const savedLang = localStorage.getItem('post-lang');
+    if (savedLang) {
+      document.body.className = 'lang-' + savedLang;
+      langSwitcher?.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === savedLang);
+      });
+    }
 
     // Reference tooltips
     document.querySelectorAll('.ref').forEach(ref => {
