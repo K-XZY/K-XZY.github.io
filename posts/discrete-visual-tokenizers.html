@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Discrete Visual Tokenizers</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/style.css?v=9">
   <style>
     /* Reference button */
     .ref {
@@ -76,8 +76,8 @@
       </div>
       <div class="nav-section">
         <div class="nav-history">
-          <button class="history-btn" onclick="history.back()">←</button>
-          <button class="history-btn" onclick="history.forward()">→</button>
+          <button class="history-btn" id="prev-post" title="Previous post">&larr;</button>
+          <button class="history-btn" id="next-post" title="Next post">&rarr;</button>
         </div>
       </div>
     </nav>
@@ -327,6 +327,7 @@
       });
     });
   </script>
+  <script src="../js/navigation.js?v=1"></script>
 </body>
 
 </html>

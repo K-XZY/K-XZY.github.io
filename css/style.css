@@ -7,8 +7,8 @@
   --elevated: #0e100e;
 
   /* Border */
-  --line: rgba(255, 255, 255, 0.06);
-  --line-hover: rgba(255, 255, 255, 0.1);
+  --line: rgba(255, 255, 255, 0.12);
+  --line-hover: rgba(255, 255, 255, 0.2);
 
   /* Jade green - core visual element */
   --jade: #1a2e1a;
@@ -359,16 +359,26 @@ body {
   font-size: 14px;
   color: var(--text-tertiary);
   text-decoration: none;
-  transition: color 0.15s;
+  transition: color 0.15s, transform 0.15s;
 }
 
 .links a:hover {
   color: var(--text-primary);
 }
 
+.links .email-link {
+  cursor: pointer;
+  position: relative;
+}
+
+.links .email-link:active {
+  transform: scale(0.95);
+}
+
 /* ==================== Search Section ==================== */
 .search-section {
   margin-bottom: 48px;
+  position: relative;
 }
 
 .search-input {
@@ -390,6 +400,47 @@ body {
 .search-input:focus {
   outline: none;
   border-color: var(--line-hover);
+}
+
+/* Tag dropdown autocomplete */
+.tag-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.tag-suggestion {
+  padding: 10px 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-size: 14px;
+}
+
+.tag-suggestion:hover {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.tag-suggestion.selected {
+  background: var(--jade);
+  color: var(--text-primary);
+}
+
+.tag-suggestion:first-child {
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.tag-suggestion:last-child {
+  border-radius: 0 0 var(--radius) var(--radius);
 }
 
 /* Tags */
@@ -681,6 +732,20 @@ body {
   border-collapse: collapse;
   margin: 20px 0;
   font-size: 14px;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .post-content table {
+    font-size: 13px;
+  }
+
+  .post-content th,
+  .post-content td {
+    padding: 10px 12px;
+  }
 }
 
 .post-content th,
@@ -732,12 +797,14 @@ body {
   background: var(--text-secondary);
   position: relative;
   transition: all 0.3s;
+  display: block;
 }
 
 .menu-icon::before,
 .menu-icon::after {
   content: '';
   position: absolute;
+  left: 0;
   width: 18px;
   height: 2px;
   background: var(--text-secondary);
@@ -784,16 +851,48 @@ body {
 
 /* ==================== Responsive ==================== */
 
-/* Breakpoint: navigator needs enough space */
+/* Breakpoint: Reduce navigator size and increase content margin */
 @media (max-width: 1200px) {
   .navigator {
     left: 24px;
-    transform: translateY(-50%) perspective(800px) rotateY(8deg) scale(1.1);
+    transform: translateY(-50%) perspective(800px) rotateY(6deg) scale(1.05);
+    width: 160px;
   }
 
   .main {
+    margin-left: 220px;
     margin-right: 5%;
     padding: 56px 48px;
+  }
+
+  .about {
+    padding-left: 0;
+  }
+
+  .avatar {
+    width: 110px;
+    height: 110px;
+    left: -20px;
+  }
+}
+
+/* Breakpoint: Further reduce for medium tablets */
+@media (max-width: 1100px) {
+  .navigator {
+    left: 16px;
+    transform: translateY(-50%) perspective(600px) rotateY(4deg) scale(0.95);
+    width: 150px;
+  }
+
+  .main {
+    margin-left: 190px;
+    padding: 48px 40px;
+  }
+
+  .avatar {
+    width: 100px;
+    height: 100px;
+    left: -16px;
   }
 }
 
@@ -839,13 +938,15 @@ body {
 
   .about {
     margin-left: 0;
-    padding-left: 40px;
+    padding-left: 20px;
+    padding-right: 140px;
   }
 
   .avatar {
     width: 100px;
     height: 100px;
-    left: -20px;
+    left: auto;
+    right: 20px;
     top: -16px;
     font-size: 36px;
   }
@@ -859,11 +960,13 @@ body {
   .about {
     padding: 32px 20px 40px;
     padding-top: 80px;
+    padding-right: 20px;
   }
 
   .avatar {
     position: relative;
     left: auto;
+    right: auto;
     top: auto;
     margin: -60px auto 20px;
     width: 80px;

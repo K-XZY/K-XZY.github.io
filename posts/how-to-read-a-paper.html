@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How to Read a Paper</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/style.css?v=9">
   <style>
     /* Reference button */
     .ref {
@@ -121,8 +121,8 @@
       </div>
       <div class="nav-section">
         <div class="nav-history">
-          <button class="history-btn" onclick="history.back()">&larr;</button>
-          <button class="history-btn" onclick="history.forward()">&rarr;</button>
+          <button class="history-btn" id="prev-post" title="Previous post">&larr;</button>
+          <button class="history-btn" id="next-post" title="Next post">&rarr;</button>
         </div>
       </div>
     </nav>
@@ -277,6 +277,28 @@
   <script>
     // Language switching
     const langSwitcher = document.getElementById('lang-switcher');
+
+    // Inject tooltips into language buttons
+    if (langSwitcher) {
+      const langLabels = {
+        'original': 'Original',
+        'en': 'English',
+        'zh': '中文',
+        'ja': '日本語',
+        'ko': '한국語',
+        'mixed': 'Mixed'
+      };
+
+      langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
+        const lang = btn.dataset.lang;
+        if (lang && langLabels[lang] && !btn.querySelector('.lang-tooltip')) {
+          const tooltip = document.createElement('span');
+          tooltip.className = 'lang-tooltip';
+          tooltip.textContent = langLabels[lang];
+          btn.appendChild(tooltip);
+        }
+      });
+    }
     langSwitcher?.addEventListener('click', (e) => {
       if (e.target.classList.contains('lang-btn')) {
         const lang = e.target.dataset.lang;
@@ -333,6 +355,7 @@
       });
     });
   </script>
+  <script src="../js/navigation.js?v=1"></script>
 </body>
 
 </html>
