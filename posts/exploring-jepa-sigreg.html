@@ -70,45 +70,20 @@
       visibility: visible;
     }
 
-    /* Language switching */
-    [data-lang] { display: none !important; }
+    /* Language switching - only hide content elements, not buttons */
+    .post-content [data-lang] { display: none !important; }
 
     /* English mode */
-    body.lang-en [data-lang="en"] { display: block !important; }
-    body.lang-en p[data-lang="en"] { display: block !important; }
-    body.lang-en li[data-lang="en"] { display: list-item !important; }
-    body.lang-en span[data-lang="en"] { display: inline !important; }
+    body.lang-en .post-content [data-lang="en"] { display: block !important; }
+    body.lang-en .post-content p[data-lang="en"] { display: block !important; }
+    body.lang-en .post-content li[data-lang="en"] { display: list-item !important; }
+    body.lang-en .post-content span[data-lang="en"] { display: inline !important; }
 
     /* Mixed mode */
-    body.lang-mixed [data-lang="mixed"] { display: block !important; }
-    body.lang-mixed p[data-lang="mixed"] { display: block !important; }
-    body.lang-mixed li[data-lang="mixed"] { display: list-item !important; }
-    body.lang-mixed span[data-lang="mixed"] { display: inline !important; }
-
-    /* Language buttons */
-    .lang-btn {
-      padding: 6px 12px;
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
-      color: #666;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .lang-btn:hover {
-      color: #999;
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-    .lang-btn.active {
-      color: var(--accent);
-      border-color: var(--accent);
-      background: rgba(160, 140, 91, 0.1);
-    }
-    .nav-lang {
-      display: flex;
-      gap: 4px;
-    }
+    body.lang-mixed .post-content [data-lang="mixed"] { display: block !important; }
+    body.lang-mixed .post-content p[data-lang="mixed"] { display: block !important; }
+    body.lang-mixed .post-content li[data-lang="mixed"] { display: list-item !important; }
+    body.lang-mixed .post-content span[data-lang="mixed"] { display: inline !important; }
   </style>
 </head>
 <body class="lang-en">
@@ -129,8 +104,8 @@
       </div>
       <div class="nav-section">
         <div class="nav-lang" id="lang-switcher">
-          <button class="lang-btn active" data-lang="en">EN</button>
           <button class="lang-btn" data-lang="mixed">X</button>
+          <button class="lang-btn active" data-lang="en">EN</button>
         </div>
       </div>
       <div class="nav-section">

@@ -196,11 +196,94 @@ research_interests:
 
 ### 多语言支持
 
+有两种方式实现多语言：
+
+#### 方式一：多文件（Markdown 文章）
+
+适用于简单的 Markdown 文章，通过 `post.js` 渲染。
+
 | 文件名 | 语言 |
 |--------|------|
 | `{slug}.md` | 原版 |
 | `{slug}.en.md` | 英文版 |
 | `{slug}.zh.md` | 中文版 |
+
+#### 方式二：内嵌切换（HTML 文章）
+
+适用于包含图表、D3 可视化等复杂交互的 HTML 文章。语言切换在单个文件内完成。
+
+**1. Navigator 添加语言按钮**
+
+```html
+<div class="nav-section">
+  <div class="nav-lang" id="lang-switcher">
+    <button class="lang-btn" data-lang="mixed">X</button>
+    <button class="lang-btn active" data-lang="en">EN</button>
+  </div>
+</div>
+```
+
+**2. Body 设置默认语言**
+
+```html
+<body class="lang-en">
+```
+
+**3. CSS 控制显示/隐藏**
+
+```css
+/* 只隐藏 .post-content 内的多语言元素，不影响按钮 */
+.post-content [data-lang] { display: none !important; }
+
+/* English mode */
+body.lang-en .post-content [data-lang="en"] { display: block !important; }
+body.lang-en .post-content p[data-lang="en"] { display: block !important; }
+body.lang-en .post-content li[data-lang="en"] { display: list-item !important; }
+body.lang-en .post-content span[data-lang="en"] { display: inline !important; }
+
+/* Mixed mode (中英混合) */
+body.lang-mixed .post-content [data-lang="mixed"] { display: block !important; }
+body.lang-mixed .post-content p[data-lang="mixed"] { display: block !important; }
+body.lang-mixed .post-content li[data-lang="mixed"] { display: list-item !important; }
+body.lang-mixed .post-content span[data-lang="mixed"] { display: inline !important; }
+```
+
+**4. 内容标记语言版本**
+
+```html
+<p data-lang="en">English content here.</p>
+<p data-lang="mixed">中英混合 content here。</p>
+
+<li data-lang="en">English list item</li>
+<li data-lang="mixed">中英混合 list item</li>
+```
+
+**5. JavaScript 切换逻辑**
+
+```javascript
+const langSwitcher = document.getElementById('lang-switcher');
+langSwitcher?.addEventListener('click', (e) => {
+  if (e.target.classList.contains('lang-btn')) {
+    const lang = e.target.dataset.lang;
+    document.body.className = 'lang-' + lang;
+    langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+    localStorage.setItem('post-lang', lang);
+  }
+});
+
+// Restore saved language
+const savedLang = localStorage.getItem('post-lang');
+if (savedLang) {
+  document.body.className = 'lang-' + savedLang;
+  langSwitcher?.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === savedLang);
+  });
+}
+```
+
+**注意**：CSS 选择器必须限制在 `.post-content` 内，否则会隐藏导航栏的语言按钮。
 
 ### Front Matter
 

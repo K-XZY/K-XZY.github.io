@@ -1,30 +1,14 @@
 {
   "posts": [
     {
-      "slug": "discrete-visual-tokenizers",
-      "date": "2025-12-14",
-      "tags": [
-        "self-supervised-learning",
-        "computer-vision"
-      ],
-      "html": "posts/discrete-visual-tokenizers.html",
-      "versions": {
-        "original": {
-          "title": "Discrete Visual Tokenizers",
-          "summary": "Exploring discrete visual tokenizers for GUI world modeling — from VQ-VAE limitations to Infinity Tokenizer, and the trade-offs we encountered.",
-          "file": "posts/discrete-visual-tokenizers.md"
-        }
-      }
-    },
-    {
       "slug": "exploring-jepa-sigreg",
-      "date": "2025-12-25",
+      "date": "2026-01-13",
       "tags": [
-        "self-supervised-learning",
+        "deep-learning",
+        "self-supervised",
         "representation-learning",
-        "computer-vision"
+        "JEPA"
       ],
-      "html": "posts/exploring-jepa-sigreg.html",
       "versions": {
         "original": {
           "title": "Exploring JEPA and SIGReg",
@@ -34,10 +18,29 @@
       }
     },
     {
+      "slug": "discrete-visual-tokenizers",
+      "date": "2025-12-14",
+      "tags": [
+        "deep-learning",
+        "visual-tokenization",
+        "world-model",
+        "GUI"
+      ],
+      "versions": {
+        "original": {
+          "title": "Discrete Visual Tokenizers",
+          "summary": "Exploring discrete visual tokenizers for GUI world modeling — from VQ-VAE limitations to Infinity Tokenizer, and the trade-offs we encountered.",
+          "file": "posts/discrete-visual-tokenizers.md"
+        }
+      }
+    },
+    {
       "slug": "how-to-read-a-paper",
       "date": "2025-01-05",
       "tags": [
-        "methodology"
+        "research",
+        "methodology",
+        "reading"
       ],
       "versions": {
         "original": {
@@ -52,10 +55,16 @@
     "original"
   ],
   "tags": [
-    "computer-vision",
+    "GUI",
+    "JEPA",
+    "deep-learning",
     "methodology",
+    "reading",
     "representation-learning",
-    "self-supervised-learning"
+    "research",
+    "self-supervised",
+    "visual-tokenization",
+    "world-model"
   ],
-  "generated_at": "2026-01-13T12:00:00.000000"
+  "generated_at": "2026-01-14T00:57:34.880562"
 }
