@@ -415,14 +415,14 @@ python build.py
 
 ### Implemented
 - [x] Google Site Verification meta tag
+- [x] Meta descriptions for all pages
+- [x] Optimized page titles with branding
+- [x] Open Graph and Twitter Card tags
+- [x] Sitemap.xml
+- [x] robots.txt
 
 ### Quick Wins (To Implement)
-1. **Meta descriptions**: Add description meta tags to all pages for better search result snippets.
 2. **Structured data**: Implement Schema.org JSON-LD for Article and Person types to enable rich snippets.
-3. **Page titles**: Optimize title tags with keywords and branding (e.g., "Post Title | Kevin Xie's Research Blog").
-4. **Open Graph tags**: Add OG meta tags for better social media link previews on Twitter, LinkedIn, etc.
-5. **Sitemap.xml**: Generate XML sitemap listing all pages to help search engines discover content.
-6. **robots.txt**: Create robots.txt file to guide search engine crawlers and reference sitemap.
 
 ### Content SEO
 - Add alt text to all images for accessibility and image search
