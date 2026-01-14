@@ -1,7 +1,7 @@
 ---
 title: Discrete Visual Tokenizers
 date: 2025-12-14
-tags: [deep-learning, visual-tokenization, world-model, GUI]
+tags: [representation-learning, self-supervised-learning, computer-vision]
 summary: Exploring discrete visual tokenizers for GUI world modeling — from VQ-VAE limitations to Infinity Tokenizer, and the trade-offs we encountered.
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: How to Read a Paper
 date: 2025-01-05
-tags: [research, methodology, reading]
+tags: [methodology]
 summary: A personal guide on reading academic papers effectively, focusing on insights and active thinking.
 ---
 

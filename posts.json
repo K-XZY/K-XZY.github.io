@@ -1,36 +1,35 @@
 {
   "posts": [
     {
-      "slug": "exploring-jepa-sigreg",
+      "slug": "exploring-jepa-sigreg-deprecated",
       "date": "2026-01-13",
       "tags": [
-        "deep-learning",
-        "self-supervised",
         "representation-learning",
-        "JEPA"
+        "self-supervised-learning",
+        "computer-vision",
+        "GUI"
       ],
       "versions": {
         "original": {
           "title": "Exploring JEPA and SIGReg",
           "summary": "Reproducing LeJEPA on CIFAR-100 with ViT-nano — understanding SIGReg regularization and attention patterns.",
-          "file": "posts/exploring-jepa-sigreg.md"
+          "file": "posts/exploring-jepa-sigreg-deprecated.md"
         }
       }
     },
     {
-      "slug": "discrete-visual-tokenizers",
+      "slug": "discrete-visual-tokenizers-deprecated",
       "date": "2025-12-14",
       "tags": [
-        "deep-learning",
-        "visual-tokenization",
-        "world-model",
-        "GUI"
+        "representation-learning",
+        "self-supervised-learning",
+        "computer-vision"
       ],
       "versions": {
         "original": {
           "title": "Discrete Visual Tokenizers",
           "summary": "Exploring discrete visual tokenizers for GUI world modeling — from VQ-VAE limitations to Infinity Tokenizer, and the trade-offs we encountered.",
-          "file": "posts/discrete-visual-tokenizers.md"
+          "file": "posts/discrete-visual-tokenizers-deprecated.md"
         }
       }
     },
@@ -38,9 +37,7 @@
       "slug": "how-to-read-a-paper",
       "date": "2025-01-05",
       "tags": [
-        "research",
-        "methodology",
-        "reading"
+        "methodology"
       ],
       "versions": {
         "original": {
@@ -56,15 +53,10 @@
   ],
   "tags": [
     "GUI",
-    "JEPA",
-    "deep-learning",
+    "computer-vision",
     "methodology",
-    "reading",
     "representation-learning",
-    "research",
-    "self-supervised",
-    "visual-tokenization",
-    "world-model"
+    "self-supervised-learning"
   ],
-  "generated_at": "2026-01-14T00:57:34.880562"
+  "generated_at": "2026-01-14T01:17:06.454977"
 }

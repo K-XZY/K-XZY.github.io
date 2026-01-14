@@ -1,7 +1,7 @@
 ---
 title: Exploring JEPA and SIGReg
 date: 2026-01-13
-tags: [deep-learning, self-supervised, representation-learning, JEPA]
+tags: [representation-learning, self-supervised-learning, computer-vision, GUI]
 summary: Reproducing LeJEPA on CIFAR-100 with ViT-nano — understanding SIGReg regularization and attention patterns.
 ---
 
@@ -32,10 +32,10 @@ Joint Embedding Predictive Architecture (JEPA) learns representations by predict
 
 There are two main approaches to self-supervised visual learning:
 
-| Approach | Method | Pros | Cons |
-|----------|--------|------|------|
-| **Generative** | Reconstruct pixels (MAE, BEiT) | Rich supervision signal | Wastes capacity on pixel details |
-| **Joint Embedding** | Predict embeddings (JEPA, SimCLR) | Focus on semantics | Risk of collapse |
+| Approach            | Method                            | Pros                    | Cons                             |
+| ------------------- | --------------------------------- | ----------------------- | -------------------------------- |
+| **Generative**      | Reconstruct pixels (MAE, BEiT)    | Rich supervision signal | Wastes capacity on pixel details |
+| **Joint Embedding** | Predict embeddings (JEPA, SimCLR) | Focus on semantics      | Risk of collapse                 |
 
 **Generative methods** like MAE mask patches and reconstruct raw pixels. The problem: the model must learn to predict exact RGB values, which includes low-level details (textures, lighting) that may not be semantically meaningful.
 
@@ -186,14 +186,14 @@ where $\phi_{\text{emp}}(t) = \frac{1}{n}\sum_{i=1}^{n} e^{itx_i}$ is the empiri
 
 ### Comparison with Other Methods
 
-| Method | Collapse Prevention | Needs Negatives | Needs EMA |
-|--------|--------------------|--------------------|-----------|
-| **SimCLR** | Contrastive loss (InfoNCE) | Yes (large batch) | No |
-| **MoCo** | Contrastive + momentum | Yes (queue) | Yes |
-| **BYOL** | Stop-gradient + EMA | No | Yes |
-| **SimSiam** | Stop-gradient | No | No |
-| **VICReg** | Variance + Covariance | No | No |
-| **LeJEPA (SIGReg)** | Gaussianity test | No | No |
+| Method              | Collapse Prevention        | Needs Negatives   | Needs EMA |
+| ------------------- | -------------------------- | ----------------- | --------- |
+| **SimCLR**          | Contrastive loss (InfoNCE) | Yes (large batch) | No        |
+| **MoCo**            | Contrastive + momentum     | Yes (queue)       | Yes       |
+| **BYOL**            | Stop-gradient + EMA        | No                | Yes       |
+| **SimSiam**         | Stop-gradient              | No                | No        |
+| **VICReg**          | Variance + Covariance      | No                | No        |
+| **LeJEPA (SIGReg)** | Gaussianity test           | No                | No        |
 
 **Key advantage of SIGReg:** It's a *sufficient* condition for non-collapse. If the distribution is truly isotropic Gaussian, it cannot be collapsed. Other methods use heuristics (stop-gradient, EMA) that work empirically but lack theoretical guarantees.
 
@@ -205,45 +205,45 @@ where $\phi_{\text{emp}}(t) = \frac{1}{n}\sum_{i=1}^{n} e^{itx_i}$ is the empiri
 
 We used a ViT-Tiny model (the config file says "nano" but actually uses tiny):
 
-| Component | Specification |
-|-----------|---------------|
-| **Model** | ViT-Tiny |
-| **Hidden dimension** | 512 |
-| **Depth** | 4 layers |
-| **Attention heads** | 8 |
-| **Parameters** | ~13M |
+| Component            | Specification |
+| -------------------- | ------------- |
+| **Model**            | ViT-Tiny      |
+| **Hidden dimension** | 512           |
+| **Depth**            | 4 layers      |
+| **Attention heads**  | 8             |
+| **Parameters**       | ~13M          |
 
-| Input Processing | Value |
-|------------------|-------|
-| **Input resolution** | 32×32 (native CIFAR) |
-| **Patch size** | 4×4 |
-| **Number of patches** | 64 (8×8 grid) |
+| Input Processing      | Value                   |
+| --------------------- | ----------------------- |
+| **Input resolution**  | 32×32 (native CIFAR)    |
+| **Patch size**        | 4×4                     |
+| **Number of patches** | 64 (8×8 grid)           |
 | **Position encoding** | 2D RoPE ($\theta=10.0$) |
-| **Register tokens** | 2 |
+| **Register tokens**   | 2                       |
 
 ### Training Hyperparameters
 
-| Hyperparameter | Value |
-|----------------|-------|
-| **Batch size** | 256 |
-| **Max steps** | 1,000,000 |
-| **Learning rate** | 0.0005 |
-| **Min learning rate** | 0.00001 |
-| **Weight decay** | 0.02 |
-| **Warmup steps** | 500 |
-| **LR schedule** | Linear warmup + Cosine annealing |
+| Hyperparameter        | Value                            |
+| --------------------- | -------------------------------- |
+| **Batch size**        | 256                              |
+| **Max steps**         | 1,000,000                        |
+| **Learning rate**     | 0.0005                           |
+| **Min learning rate** | 0.00001                          |
+| **Weight decay**      | 0.02                             |
+| **Warmup steps**      | 500                              |
+| **LR schedule**       | Linear warmup + Cosine annealing |
 
-| Loss Hyperparameters | Value |
-|---------------------|-------|
-| **$\lambda$ (SIGReg weight)** | 0.05 |
-| **Random directions $\|A\|$** | 1024 |
+| Loss Hyperparameters          | Value |
+| ----------------------------- | ----- |
+| **$\lambda$ (SIGReg weight)** | 0.05  |
+| **Random directions $\|A\|$** | 1024  |
 
-| View Generation | Value |
-|-----------------|-------|
-| **Global views** | 2 |
-| **Local views** | 8 |
+| View Generation  | Value      |
+| ---------------- | ---------- |
+| **Global views** | 2          |
+| **Local views**  | 8          |
 | **Global scale** | [0.5, 1.0] |
-| **Local scale** | [0.2, 0.5] |
+| **Local scale**  | [0.2, 0.5] |
 
 ### Training Curves
 
@@ -302,14 +302,14 @@ Comparing attention patterns across 8 heads reveals different behaviors:
 
 The two models differ significantly in their architecture and input processing:
 
-| Config | Nano Model | Old Model |
-|--------|------------|-----------|
-| **Image Size** | 32×32 (native CIFAR) | 224×224 (upscaled 7×) |
-| **Patch Size** | 4×4 | 16×16 |
-| **Num Tokens** | 64 (8×8 grid) | 196 (14×14 grid) |
-| **Model Size** | tiny (d=512, depth=4) | small (d=512, depth=?) |
-| **Position Encoding** | 2D RoPE (θ=10.0) | Learned |
-| **Register Tokens** | 2 | 4 |
+| Config                | Nano Model            | Old Model              |
+| --------------------- | --------------------- | ---------------------- |
+| **Image Size**        | 32×32 (native CIFAR)  | 224×224 (upscaled 7×)  |
+| **Patch Size**        | 4×4                   | 16×16                  |
+| **Num Tokens**        | 64 (8×8 grid)         | 196 (14×14 grid)       |
+| **Model Size**        | tiny (d=512, depth=4) | small (d=512, depth=?) |
+| **Position Encoding** | 2D RoPE (θ=10.0)      | Learned                |
+| **Register Tokens**   | 2                     | 4                      |
 
 **Key differences:**
 1. **Token count**: Old model has 3× more tokens (196 vs 64)
@@ -318,13 +318,13 @@ The two models differ significantly in their architecture and input processing:
 
 ### Attention Metrics
 
-| Metric | Nano 32×32 | Old Model 224×224 |
-|--------|------------|-------------------|
-| Entropy | 4.08 | 4.97 |
-| Sparsity | 19% | 88% |
-| Max Attention | 0.029 | 0.044 |
-| **Head Diversity** | **0.24** | **0.63** |
-| **Head Similarity** | **0.756** | **0.374** |
+| Metric              | Nano 32×32 | Old Model 224×224 |
+| ------------------- | ---------- | ----------------- |
+| Entropy             | 4.08       | 4.97              |
+| Sparsity            | 19%        | 88%               |
+| Max Attention       | 0.029      | 0.044             |
+| **Head Diversity**  | **0.24**   | **0.63**          |
+| **Head Similarity** | **0.756**  | **0.374**         |
 
 ### Key Finding: Head Collapse in Nano Model
 
