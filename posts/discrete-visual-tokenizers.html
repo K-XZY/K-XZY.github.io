@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discrete Visual Tokenizers</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Reference button */
+    .ref {
+      display: inline-block;
+      color: var(--accent);
+      background: rgba(160, 140, 91, 0.1);
+      border: 1px solid rgba(160, 140, 91, 0.3);
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      user-select: none;
+    }
+
+    .ref:hover {
+      color: var(--text-primary);
+      background: rgba(160, 140, 91, 0.2);
+      border-color: var(--accent);
+    }
+
+    /* Tooltip */
+    .ref .tooltip {
+      position: fixed;
+      background: #1a1c1a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #ccc;
+      white-space: normal;
+      width: max-content;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s, visibility 0.15s;
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    .ref:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Navigator -->
+    <nav class="navigator" id="navigator">
+      <div class="nav-section">
+        <div class="nav-links">
+          <a href="../index.html" class="nav-link">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+          </a>
+          <a href="../index.html#posts" class="nav-link active">
+            <span class="nav-icon">✎</span>
+            <span>Blog</span>
+          </a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-history">
+          <button class="history-btn" onclick="history.back()">←</button>
+          <button class="history-btn" onclick="history.forward()">→</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+      <span class="menu-icon"></span>
+    </button>
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main">
+      <article class="post-page">
+        <header class="post-page-header">
+          <h1 class="post-page-title">Discrete Visual Tokenizers</h1>
+          <div class="post-page-meta">December 14, 2025</div>
+          <div class="post-page-tags">
+            <span class="post-tag">deep-learning</span>
+            <span class="post-tag">visual-tokenization</span>
+            <span class="post-tag">world-model</span>
+            <span class="post-tag">GUI</span>
+          </div>
+        </header>
+
+        <div class="post-content">
+          <blockquote>
+            Lessons learned from building a GUI world model with discrete visual tokenizers.
+          </blockquote>
+
+          <p>During our time working on GUI World Model, we have spent significant time diving into discrete visual tokenizers.</p>
+
+          <hr>
+
+          <h2>1. Why Discrete Tokenizers?</h2>
+
+          <p>Early works like <span class="ref">[Chang, 2022]<span class="tooltip">Chang et al. "MaskGIT: Masked Generative Image Transformer" (CVPR 2022)</span></span> and <span class="ref">[Gupta, 2023]<span class="tooltip">Gupta et al. "MaskViT: Masked Visual Pre-Training for Video Prediction" (ICLR 2023)</span></span> demonstrated how to use masked autoregressive generation on visual tokens. More recently, <span class="ref">[Bruce, 2024]<span class="tooltip">Bruce et al. "Genie: Generative Interactive Environments" (ICML 2024)</span></span> built a foundation world model using a self-trained VQ-VAE tokenizer.</p>
+
+          <p>Discrete tokenizers are good for long horizon generation for the following reasons:</p>
+
+          <ol>
+            <li><strong>Avoiding error accumulation</strong>: They naturally avoid error accumulation since we take argmax of the predictor's / generator's output distribution, essentially snapping into decoder's and generator's training distribution (i.e. seen vectors).</li>
+            <li><strong>Simpler training</strong>: The training is thus simpler since we can simply do teacher forcing, without needing to worry about distribution shifts.</li>
+          </ol>
+
+          <hr>
+
+          <h2>2. The Reconstruction Problem</h2>
+
+          <p>However, traditional visual tokenizers before Infinity Token have problems reconstructing details such as texts and other patterns
+            <span class="ref">[Lin, 2025]<span class="tooltip">Lin et al. "VTBench: Evaluating Visual Tokenizers for Autoregressive Image Generation" (2025)</span></span>.
+          </p>
+
+          <figure style="margin: 20px 0;">
+            <img src="images/VTBench.png" alt="VTBench comparison of visual tokenizers" style="max-width: 100%; border-radius: 3px;">
+            <figcaption style="margin-top: 10px; font-size: 0.9em; color: #888; line-height: 1.5;">
+              Comparison of different encoder-decoders compressing and decompressing text screenshots. Text encoding/decoding is one of the most challenging problems for visual tokenizers. Among discrete tokenizers, only Infinity can clearly reconstruct text — even many continuous tokenizers fail at this task. Notice that reconstruction quality improves with codebook size: VAR-512 and BSQ with larger codebooks outperform earlier VQ tokenizers like MaskBit or TiTok. Infinity pushes this to the limit.
+            </figcaption>
+          </figure>
+
+          <p>This turns out to be a problem with <strong>representation capacity</strong>. The simple math can show that VQ-VAE has far less token vocab comparing to language models (typical VQ codebook: 1K-16K vs LLM vocab: 30K-100K+).</p>
+
+          <hr>
+
+          <h2>3. Scaling Codebook Capacity</h2>
+
+          <h3>The Challenges of Naive Scaling</h3>
+
+          <p>The main issue with naively scaling the codebook capacity (i.e. just use a bigger codebook) is:</p>
+
+          <ol>
+            <li><strong>Low utilization</strong>: The model doesn't necessarily leverage all that capacity, leading to low codebook usage</li>
+            <li><strong>Harder prediction</strong>: It makes prediction vastly more challenging as now it has to learn a much larger space for classification</li>
+            <li><strong>Lookup cost</strong>: Look up cost also grows with the codebook size — O(K × D), where K is codebook size and D is vector dimension</li>
+          </ol>
+
+          <p>Note: the intuition is that visual tokenizers should have a larger codebook size than language if it is to capture both texts and textures visually.</p>
+
+          <h3>New Approaches</h3>
+
+          <p>Starting in 2024, LFQ, BSQ, and VAR-256 showed new ways to scale tokenizer capacity.</p>
+
+          <p><strong>LFQ</strong>
+            <span class="ref">[Yu, 2024]<span class="tooltip">Yu et al. "Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation" (ICLR 2024)</span></span>
+            decomposes the latent space into log₂(K) independent binary dimensions, quantized using only the sign function.
+          </p>
+
+          <p><strong>BSQ</strong>
+            <span class="ref">[Zhao, 2025]<span class="tooltip">Zhao et al. "Image and Video Tokenization with Binary Spherical Quantization" (ICLR 2025)</span></span>
+            improves on LFQ by projecting onto a hypersphere before binary quantization, providing bounded error and easier training.
+          </p>
+
+          <p>Both lookup-free methods allow codebook scaling via 2<sup>N</sup>, which is combinatorially larger than vanilla VQ.</p>
+
+          <p><strong>VAR-256</strong>
+            <span class="ref">[Tian, 2024]<span class="tooltip">Tian et al. "Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction" (NeurIPS 2024 Best Paper)</span></span>
+            showed that you can also scale the codebook size by having multiple scales, i.e. residual vector quantization. This means a feature vector can now be a composition of layers of codes.
+          </p>
+
+          <p><strong>Infinity Tokenizer</strong>
+            <span class="ref">[Han, 2025]<span class="tooltip">Han et al. "Infinity: Scaling Bitwise AutoRegressive Modeling for High-Resolution Image Synthesis" (CVPR 2025 Oral)</span></span>
+            integrates both methods and for the first time, discrete tokenizers showed superior performance than continuous tokenizers (e.g. Stable Diffusion encoder).
+          </p>
+
+          <hr>
+
+          <h2>4. Hope and Trade-offs</h2>
+
+          <p>We were hopeful that these tokenizers would be able to encode and decode texts, thus allowing generation of textual details on GUI screens. And as shown by VTBench and our own data, it is clear that Infinity tokenizer is capable of doing so.</p>
+
+          <p>However, such improvement also diminished some of the original advantages of discrete tokenizers:</p>
+
+          <ul>
+            <li>The larger codebook size comes from slightly complex algebra which isn't as intuitive to program as vanilla VQ</li>
+            <li>Our model has to perform multi-scale prediction for every single image, which increases the number of forward passes and vastly increases the attention size</li>
+            <li>The binary tokens require the model to learn multi-mode prediction of orthogonal visual texture vectors rather than clean semantics (see VL-JEPA's claim)</li>
+          </ul>
+
+          <p>This means we need very large models to generate images.</p>
+
+          <hr>
+
+          <h2>5. Our Experiment</h2>
+
+          <h3>Hypothesis</h3>
+
+          <p>Can language be modeled from pixels alone via masked modeling?</p>
+
+          <h3>Problems Encountered</h3>
+
+          <p>We ran into a few problems:</p>
+
+          <ol>
+            <li><strong>Masking in residual setup</strong>: It is unclear how to mask the visual in a residual setup, especially since we found the visual features leak in the CNN+ViT hybrid of the Infinity encoder</li>
+            <li><strong>Semantic capture</strong>: The tokenizer isn't really good at capturing semantics as mentioned earlier. The model had a far easier time when we used an untrained CNN as encoder</li>
+            <li><strong>Multi-scale learning</strong>: Next scale prediction takes a very long time to learn good enough views for every scale, such that scale-to-scale prediction can yield visually meaningful results. Unfortunately we couldn't train long enough for that to be fully visible</li>
+          </ol>
+
+          <h3>Outcome</h3>
+
+          <p>In the end we had to call off the experiment due to limited resources.</p>
+
+          <hr>
+
+          <h2>References</h2>
+
+          <ul>
+            <li>Chang et al. — MaskGIT: Masked Generative Image Transformer. CVPR, Jun 2022. <a href="https://arxiv.org/abs/2202.04200" target="_blank">[arXiv]</a></li>
+            <li>Gupta et al. — MaskViT: Masked Visual Pre-Training for Video Prediction. ICLR, May 2023. <a href="https://arxiv.org/abs/2206.11894" target="_blank">[arXiv]</a></li>
+            <li>Bruce et al. — Genie: Generative Interactive Environments. ICML, Jul 2024. <a href="https://arxiv.org/abs/2402.15391" target="_blank">[arXiv]</a></li>
+            <li>Lin et al. — VTBench: Evaluating Visual Tokenizers for Autoregressive Image Generation. arXiv, May 2025. <a href="https://arxiv.org/abs/2505.13439" target="_blank">[arXiv]</a></li>
+            <li>Yu et al. — Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation. ICLR, May 2024. <a href="https://arxiv.org/abs/2310.05737" target="_blank">[arXiv]</a></li>
+            <li>Zhao et al. — Image and Video Tokenization with Binary Spherical Quantization. ICLR, May 2025. <a href="https://arxiv.org/abs/2406.07548" target="_blank">[arXiv]</a></li>
+            <li>Tian et al. — Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction. NeurIPS, Dec 2024. <a href="https://arxiv.org/abs/2404.02905" target="_blank">[arXiv]</a></li>
+            <li>Han et al. — Infinity: Scaling Bitwise AutoRegressive Modeling for High-Resolution Image Synthesis. CVPR, Jun 2025. <a href="https://arxiv.org/abs/2412.04431" target="_blank">[arXiv]</a></li>
+          </ul>
+
+        </div>
+      </article>
+
+      <footer class="footer">
+        &copy; 2025
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Mobile menu
+    const toggle = document.getElementById('menu-toggle');
+    const navigator = document.getElementById('navigator');
+    const overlay = document.getElementById('nav-overlay');
+
+    toggle?.addEventListener('click', () => {
+      toggle.classList.toggle('active');
+      navigator.classList.toggle('active');
+      overlay.classList.toggle('active');
+      document.body.style.overflow = navigator.classList.contains('active') ? 'hidden' : '';
+    });
+
+    overlay?.addEventListener('click', () => {
+      toggle.classList.remove('active');
+      navigator.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    // Reference tooltips
+    document.querySelectorAll('.ref').forEach(ref => {
+      const tooltip = ref.querySelector('.tooltip');
+      if (!tooltip) return;
+
+      ref.addEventListener('mouseenter', () => {
+        const rect = ref.getBoundingClientRect();
+
+        // Position above the reference
+        tooltip.style.left = rect.left + rect.width / 2 + 'px';
+        tooltip.style.top = rect.top - 8 + 'px';
+        tooltip.style.transform = 'translate(-50%, -100%)';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -223,9 +223,12 @@ async function loadAndRenderPost(slug) {
     // Render content
     let html = renderMarkdown(content);
     html = processChartPlaceholders(html);
+    html = processDiagramPlaceholders(html);
     document.getElementById('post-content').innerHTML = html;
     renderMath();
     renderCharts();
+    renderDiagrams();
+    setupReferenceTooltips();
 
   } catch (error) {
     console.error('Error loading post:', error);
@@ -239,25 +242,145 @@ function parseFrontMatter(markdown) {
 }
 
 function renderMarkdown(markdown) {
+  // IMPORTANT: Extract math BEFORE markdown parsing to prevent * and _ from being
+  // interpreted as italic/bold inside formulas like $\{z_{v}\}_{v=1}^{V}$
+
+  const mathPlaceholders = [];
+  const referencePlaceholders = [];
+
+  // Extract inline references: (Author et al., "Title", Venue Year)
+  // Match pattern like: (Lin et al., "VTBench: ...", 2025) or (Yu et al., "...", ICLR 2024)
+  // Also handle curly quotes and different quote styles
+  markdown = markdown.replace(/\(([A-Z][a-z]+ et al\.), [""]([^""]+)[""], ([^)]+)\)/g, (_, authors, title, venue) => {
+    const id = `%%REF_${referencePlaceholders.length}%%`;
+    referencePlaceholders.push({ id, authors, title, venue });
+    return id;
+  });
+
+  // Extract display math first: $$ ... $$ (including surrounding newlines to avoid <br> issues)
+  markdown = markdown.replace(/\n?\$\$([\s\S]*?)\$\$\n?/g, (match, math) => {
+    const id = `\n%%DISPLAY_MATH_${mathPlaceholders.length}%%\n`;
+    mathPlaceholders.push({ id: id.trim(), math: math.trim(), display: true });
+    return id;
+  });
+
+  // Extract inline math: $ ... $ (but not $$ or escaped \$)
+  markdown = markdown.replace(/(?<!\$)\$(?!\$)([^\$\n]+?)(?<!\$)\$(?!\$)/g, (match, math) => {
+    const id = `%%INLINE_MATH_${mathPlaceholders.length}%%`;
+    mathPlaceholders.push({ id, math: math.trim(), display: false });
+    return id;
+  });
+
+  // Now parse markdown (math is protected)
   marked.setOptions({ breaks: true, gfm: true });
-  return marked.parse(markdown);
+  let html = marked.parse(markdown);
+
+  // Restore math with KaTeX rendering
+  for (const { id, math, display } of mathPlaceholders) {
+    try {
+      const rendered = katex.renderToString(math, { displayMode: display, throwOnError: false });
+      // For display math, wrap in a div for proper block display
+      const wrapped = display ? `<div class="math-display">${rendered}</div>` : rendered;
+      html = html.replaceAll(id, wrapped);
+    } catch (e) {
+      html = html.replaceAll(id, display ? `$$${math}$$` : `$${math}$`);
+    }
+  }
+
+  // Restore references with tooltip spans
+  for (const { id, authors, title, venue } of referencePlaceholders) {
+    const tooltipText = `${authors} "${title}" (${venue})`;
+    const shortRef = `[${authors.split(' ')[0]}]`;
+    const refHtml = `<span class="ref-cite" data-tooltip="${escapeAttr(tooltipText)}">${shortRef}</span>`;
+    html = html.replaceAll(id, refHtml);
+  }
+
+  return html;
+}
+
+function escapeAttr(str) {
+  return str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Setup reference tooltips with real DOM elements
+function setupReferenceTooltips() {
+  const refs = document.querySelectorAll('.ref-cite');
+
+  // Create tooltip element once
+  let tooltip = document.getElementById('ref-tooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'ref-tooltip';
+    tooltip.className = 'ref-tooltip';
+    document.body.appendChild(tooltip);
+  }
+
+  refs.forEach(ref => {
+    ref.addEventListener('mouseenter', (e) => {
+      const text = ref.dataset.tooltip;
+      if (!text) return;
+
+      tooltip.textContent = text;
+      tooltip.classList.add('visible');
+
+      // Position tooltip above the reference
+      const rect = ref.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+
+      let left = rect.left + rect.width / 2 - tooltipRect.width / 2;
+      let top = rect.top - tooltipRect.height - 8;
+
+      // Keep within viewport
+      if (left < 8) left = 8;
+      if (left + tooltipRect.width > window.innerWidth - 8) {
+        left = window.innerWidth - tooltipRect.width - 8;
+      }
+      if (top < 8) {
+        top = rect.bottom + 8; // Show below if no room above
+      }
+
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+    });
+
+    ref.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+    });
+  });
 }
 
 function renderMath() {
-  const content = document.getElementById('post-content');
+  // Math is now rendered during markdown parsing, this function is kept for compatibility
+  // but no longer needed for the main rendering flow
+}
 
-  // Display math: $$ ... $$
-  content.innerHTML = content.innerHTML.replace(/\$\$([\s\S]*?)\$\$/g, (match, math) => {
-    try {
-      return katex.renderToString(math.trim(), { displayMode: true, throwOnError: false });
-    } catch (e) { return match; }
+// Process diagram placeholders: ```diagram:type``` -> <div id="diagram-N" data-diagram="type">
+function processDiagramPlaceholders(html) {
+  let diagramCounter = 0;
+
+  // marked.js outputs: <pre><code class="language-diagram:type">\n</code></pre>
+  // Use a single pattern that matches this format
+  html = html.replace(/<pre><code class="language-diagram:(\w+)"[^>]*>[\s\S]*?<\/code><\/pre>/gi, (match, type) => {
+    console.log('Matched diagram placeholder:', type);
+    const id = `diagram-${diagramCounter++}`;
+    return `<div id="${id}" data-diagram="${type}" class="diagram-container" style="margin: 1.5rem 0;"></div>`;
   });
 
-  // Inline math: $ ... $
-  content.innerHTML = content.innerHTML.replace(/(?<!\$)\$(?!\$)(.*?)(?<!\$)\$(?!\$)/g, (match, math) => {
-    try {
-      return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
-    } catch (e) { return match; }
+  return html;
+}
+
+// Render all diagrams in the document
+function renderDiagrams() {
+  const diagrams = document.querySelectorAll('[data-diagram]');
+  console.log('renderDiagrams called, found:', diagrams.length, 'diagram containers');
+  diagrams.forEach(container => {
+    const diagramType = container.dataset.diagram;
+    console.log('Processing diagram:', diagramType, 'id:', container.id);
+    if (diagramType === 'jepa' && typeof renderJEPADiagram === 'function') {
+      renderJEPADiagram(container.id);
+    } else if (diagramType === 'simsiam' && typeof renderSimSiamDiagram === 'function') {
+      renderSimSiamDiagram(container.id);
+    }
   });
 }
 

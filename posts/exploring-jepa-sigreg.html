@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exploring JEPA and SIGReg</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="../js/diagrams.js"></script>
+  <style>
+    /* Math display */
+    .math-display {
+      display: block;
+      text-align: center;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .katex { font-size: 1.1em; }
+    .katex-display { margin: 1rem 0; }
+
+    /* Reference button */
+    .ref {
+      display: inline-block;
+      color: var(--accent);
+      background: rgba(160, 140, 91, 0.1);
+      border: 1px solid rgba(160, 140, 91, 0.3);
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      user-select: none;
+    }
+
+    .ref:hover {
+      color: var(--text-primary);
+      background: rgba(160, 140, 91, 0.2);
+      border-color: var(--accent);
+    }
+
+    /* Tooltip */
+    .ref .tooltip {
+      position: fixed;
+      background: #1a1c1a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #ccc;
+      white-space: normal;
+      width: max-content;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s, visibility 0.15s;
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    .ref:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Language switching */
+    [data-lang] { display: none !important; }
+
+    /* English mode */
+    body.lang-en [data-lang="en"] { display: block !important; }
+    body.lang-en p[data-lang="en"] { display: block !important; }
+    body.lang-en li[data-lang="en"] { display: list-item !important; }
+    body.lang-en span[data-lang="en"] { display: inline !important; }
+
+    /* Mixed mode */
+    body.lang-mixed [data-lang="mixed"] { display: block !important; }
+    body.lang-mixed p[data-lang="mixed"] { display: block !important; }
+    body.lang-mixed li[data-lang="mixed"] { display: list-item !important; }
+    body.lang-mixed span[data-lang="mixed"] { display: inline !important; }
+
+    /* Language buttons */
+    .lang-btn {
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      color: #666;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .lang-btn:hover {
+      color: #999;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .lang-btn.active {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(160, 140, 91, 0.1);
+    }
+    .nav-lang {
+      display: flex;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body class="lang-en">
+  <div class="layout">
+    <!-- Navigator -->
+    <nav class="navigator" id="navigator">
+      <div class="nav-section">
+        <div class="nav-links">
+          <a href="../index.html" class="nav-link">
+            <span class="nav-icon">&#8962;</span>
+            <span>Home</span>
+          </a>
+          <a href="../index.html#posts" class="nav-link active">
+            <span class="nav-icon">&#9998;</span>
+            <span>Blog</span>
+          </a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-lang" id="lang-switcher">
+          <button class="lang-btn active" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="mixed">X</button>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-history">
+          <button class="history-btn" onclick="history.back()">&larr;</button>
+          <button class="history-btn" onclick="history.forward()">&rarr;</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+      <span class="menu-icon"></span>
+    </button>
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main">
+      <article class="post-page">
+        <header class="post-page-header">
+          <h1 class="post-page-title">Exploring JEPA and SIGReg</h1>
+          <div class="post-page-meta">January 13, 2026</div>
+          <div class="post-page-tags">
+            <span class="post-tag">self-supervised</span>
+            <span class="post-tag">representation-learning</span>
+            <span class="post-tag">JEPA</span>
+          </div>
+        </header>
+
+        <div class="post-content">
+          <blockquote>
+            <span data-lang="en">Reproducing LeJEPA on CIFAR-100 with ViT-Tiny — SIGReg prevents collapse without contrastive samples, but we discovered an interesting head collapse phenomenon in nano-scale models.</span>
+            <span data-lang="mixed">Reproducing LeJEPA on CIFAR-100 with ViT-Tiny — SIGReg prevents collapse without contrastive samples, but we discovered an interesting head collapse phenomenon in nano-scale models.</span>
+          </blockquote>
+
+          <p data-lang="en">LeJEPA
+            <span class="ref">[Balestriero]<span class="tooltip">Balestriero &amp; LeCun "LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics" (arXiv 2025)</span></span>
+            proposes a theoretically provable regularization term (SIGReg) to prevent joint embedding collapse. We reproduced this method on CIFAR-100 with ViT-Tiny.
+          </p>
+          <p data-lang="mixed">LeJEPA
+            <span class="ref">[Balestriero]<span class="tooltip">Balestriero &amp; LeCun "LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics" (arXiv 2025)</span></span>
+            提出了一个理论上可证明的 regularization term (SIGReg) 来防止 joint embedding 的 collapse。我们在 CIFAR-100 上用 ViT-Tiny 复现了这个方法。
+          </p>
+
+          <hr>
+
+          <h2>1. Background</h2>
+
+          <h3>Joint Embedding vs Generative</h3>
+
+          <p data-lang="en">Self-supervised learning has two main approaches:</p>
+          <p data-lang="mixed">Self-supervised learning 有两条路线：</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Approach</th>
+                <th>Method</th>
+                <th>Pros</th>
+                <th>Cons</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Generative</strong></td>
+                <td>Reconstruct pixels (MAE
+                  <span class="ref">[He]<span class="tooltip">He et al. "Masked Autoencoders Are Scalable Vision Learners" (CVPR 2022)</span></span>)</td>
+                <td>Rich supervision</td>
+                <td>Wastes capacity on pixel details</td>
+              </tr>
+              <tr>
+                <td><strong>Joint Embedding</strong></td>
+                <td>Predict embeddings (JEPA, SimCLR)</td>
+                <td>Focus on semantics</td>
+                <td>Risk of collapse</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p data-lang="en">The core idea of JEPA: instead of reconstructing pixels, make different views of the same image close in embedding space. If the encoder can map different crops to similar embeddings, it has learned invariant semantic features.</p>
+          <p data-lang="mixed">JEPA 的核心 idea：不重建 pixels，而是让同一张图的不同 views 在 embedding space 里靠近。如果 encoder 能把不同 crop 映射到相似的 embedding，说明它学到了 invariant 的 semantic features。</p>
+
+          <div id="diagram-jepa" class="diagram-container" style="margin: 1.5rem 0;"></div>
+
+          <h3>The Collapse Problem</h3>
+
+          <p data-lang="en">The biggest problem with joint embedding is collapse: the model can "cheat" by mapping all inputs to the same point.</p>
+          <p data-lang="mixed">Joint embedding 最大的问题是 collapse：模型可以把所有 input 映射到同一个点来 "cheat"。</p>
+
+          <p data-lang="en">Common methods to prevent collapse:</p>
+          <p data-lang="mixed">常见的防 collapse 方法：</p>
+          <ul>
+            <li data-lang="en"><strong>Contrastive</strong> (SimCLR
+              <span class="ref">[Chen]<span class="tooltip">Chen et al. "A Simple Framework for Contrastive Learning of Visual Representations" (ICML 2020)</span></span>, MoCo
+              <span class="ref">[He]<span class="tooltip">He et al. "Momentum Contrast for Unsupervised Visual Representation Learning" (CVPR 2020)</span></span>): Use negative samples to push apart embeddings from different images</li>
+            <li data-lang="en"><strong>Stop-gradient</strong> (SimSiam
+              <span class="ref">[Chen]<span class="tooltip">Chen &amp; He "Exploring Simple Siamese Representation Learning" (CVPR 2021)</span></span>): Asymmetric updates to prevent trivial solutions</li>
+            <li data-lang="en"><strong>EMA</strong> (BYOL
+              <span class="ref">[Grill]<span class="tooltip">Grill et al. "Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning" (NeurIPS 2020)</span></span>): Momentum encoder as a stable target</li>
+            <li data-lang="mixed"><strong>Contrastive</strong> (SimCLR
+              <span class="ref">[Chen]<span class="tooltip">Chen et al. "A Simple Framework for Contrastive Learning of Visual Representations" (ICML 2020)</span></span>, MoCo
+              <span class="ref">[He]<span class="tooltip">He et al. "Momentum Contrast for Unsupervised Visual Representation Learning" (CVPR 2020)</span></span>): 用 negative samples 推开不同图的 embeddings</li>
+            <li data-lang="mixed"><strong>Stop-gradient</strong> (SimSiam
+              <span class="ref">[Chen]<span class="tooltip">Chen &amp; He "Exploring Simple Siamese Representation Learning" (CVPR 2021)</span></span>): 不对称更新，阻止 trivial solution</li>
+            <li data-lang="mixed"><strong>EMA</strong> (BYOL
+              <span class="ref">[Grill]<span class="tooltip">Grill et al. "Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning" (NeurIPS 2020)</span></span>): momentum encoder 作为稳定的 target</li>
+          </ul>
+
+          <div id="diagram-simsiam" class="diagram-container" style="margin: 1.5rem 0;"></div>
+
+          <p data-lang="en">These methods work empirically but lack theoretical guarantees. LeJEPA's SIGReg provides a provably sufficient condition.</p>
+          <p data-lang="mixed">这些方法 empirically work，但缺乏理论保证。LeJEPA 的 SIGReg 提供了一个 provably sufficient condition。</p>
+
+          <hr>
+
+          <h2>2. SIGReg</h2>
+
+          <p data-lang="en">LeJEPA's loss has two components:</p>
+          <p data-lang="mixed">LeJEPA 的 loss 有两部分：</p>
+
+          <div class="math-display" data-formula="\mathcal{L} = (1 - \lambda) \cdot \mathcal{L}_{\text{inv}} + \lambda \cdot \mathcal{L}_{\text{SIGReg}}"></div>
+
+          <h3>Invariance Loss</h3>
+
+          <p data-lang="en">Make all views of the same image map to similar embeddings:</p>
+          <p data-lang="mixed">让同一张图的所有 views 映射到相似的 embedding：</p>
+
+          <div class="math-display" data-formula="\mathcal{L}_{\text{inv}} = \frac{1}{N \cdot V} \sum_{n=1}^{N} \sum_{v=1}^{V} \|z_{n,v} - \bar{z}_n\|_2^2"></div>
+
+          <p data-lang="en">This is simply the distance from each view to the mean embedding. If representations are truly invariant, different augmentations will map to the same point.</p>
+          <p data-lang="mixed">就是每个 view 到 mean embedding 的距离。如果表示真的 invariant，不同 augmentation 会映射到同一点。</p>
+
+          <h3>SIGReg: Sketched Isotropic Gaussian Regularization</h3>
+
+          <p data-lang="en">Core insight: if the embedding distribution is isotropic Gaussian <span class="math" data-formula="\mathcal{N}(0, I)"></span>, it cannot collapse. Because Gaussian is the "most spread out" distribution.</p>
+          <p data-lang="mixed">核心 insight：如果 embedding distribution 是 isotropic Gaussian <span class="math" data-formula="\mathcal{N}(0, I)"></span>，那它不可能 collapse。因为 Gaussian 是 "most spread out" 的分布。</p>
+
+          <p data-lang="en"><strong>Cramér-Wold Theorem</strong>: A distribution is Gaussian if and only if all its 1D projections are Gaussian. So we can test using many random directions:</p>
+          <p data-lang="mixed"><strong>Cramér-Wold Theorem</strong>：一个分布是 Gaussian 当且仅当它的所有 1D projections 都是 Gaussian。所以我们可以用很多 random directions 来测试：</p>
+
+          <div class="math-display" data-formula="\mathcal{L}_{\text{SIGReg}} = \frac{1}{|A|} \sum_{a \in A} \text{EP}\left(\{a^\top z_i\}_{i=1}^{N \cdot V}\right)"></div>
+
+          <p data-lang="en">where EP is the Epps-Pulley test, measuring the difference between the 1D distribution and a standard Gaussian.</p>
+          <p data-lang="mixed">其中 EP 是 Epps-Pulley test，测量 1D distribution 和 standard Gaussian 的差距。</p>
+
+          <h3>Why SIGReg Works</h3>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Collapse Prevention</th>
+                <th>Needs Negatives</th>
+                <th>Theoretical Guarantee</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SimCLR</td>
+                <td>InfoNCE</td>
+                <td>Yes</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td>BYOL</td>
+                <td>Stop-grad + EMA</td>
+                <td>No</td>
+                <td>No</td>
+              </tr>
+              <tr>
+                <td>VICReg
+                  <span class="ref">[Bardes]<span class="tooltip">Bardes et al. "VICReg: Variance-Invariance-Covariance Regularization for Self-Supervised Learning" (ICLR 2022)</span></span>
+                </td>
+                <td>Variance + Covariance</td>
+                <td>No</td>
+                <td>Partial</td>
+              </tr>
+              <tr>
+                <td><strong>LeJEPA</strong></td>
+                <td>Gaussianity test</td>
+                <td>No</td>
+                <td><strong>Yes</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <hr>
+
+          <h2>3. Experiment Setup</h2>
+
+          <h3>Model</h3>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Specification</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Model</strong></td>
+                <td>ViT-Tiny (d=512, depth=4, heads=8)</td>
+              </tr>
+              <tr>
+                <td><strong>Parameters</strong></td>
+                <td>~13M</td>
+              </tr>
+              <tr>
+                <td><strong>Input</strong></td>
+                <td>32×32 (native CIFAR)</td>
+              </tr>
+              <tr>
+                <td><strong>Patch size</strong></td>
+                <td>4×4 → 64 tokens (8×8 grid)</td>
+              </tr>
+              <tr>
+                <td><strong>Position encoding</strong></td>
+                <td>2D RoPE (θ=10.0)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Training</h3>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Hyperparameter</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Batch size</td>
+                <td>256</td>
+              </tr>
+              <tr>
+                <td>Learning rate</td>
+                <td>5e-4 (cosine → 1e-5)</td>
+              </tr>
+              <tr>
+                <td>Weight decay</td>
+                <td>0.02</td>
+              </tr>
+              <tr>
+                <td>Views</td>
+                <td>2 global + 8 local</td>
+              </tr>
+              <tr>
+                <td>λ (SIGReg weight)</td>
+                <td>0.05</td>
+              </tr>
+              <tr>
+                <td>Training time</td>
+                <td>~24h (1× RTX 5090)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <hr>
+
+          <h2>4. Results</h2>
+
+          <h3>Training Curves</h3>
+
+          <div id="training-charts" class="charts-container" style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:1rem;margin:1.5rem 0;">
+            <p style="color:#666;text-align:center;">Loading training curves...</p>
+          </div>
+
+          <h3>Linear Probe</h3>
+
+          <p data-lang="en">Final accuracy: <strong>61.6%</strong> on CIFAR-100 (linear probe on frozen embeddings).</p>
+          <p data-lang="mixed">Final accuracy: <strong>61.6%</strong> on CIFAR-100 (linear probe on frozen embeddings)。</p>
+
+          <p data-lang="en">Comparison with LeJEPA paper:</p>
+          <p data-lang="mixed">和 LeJEPA paper 的对比：</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Config</th>
+                <th>Ours</th>
+                <th>LeJEPA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Model</td>
+                <td>ViT-Tiny (~13M)</td>
+                <td>ViT-Large (304M)</td>
+              </tr>
+              <tr>
+                <td>Dataset</td>
+                <td>CIFAR-100</td>
+                <td>ImageNet-1K</td>
+              </tr>
+              <tr>
+                <td>Epochs</td>
+                <td>~1,100</td>
+                <td>100</td>
+              </tr>
+              <tr>
+                <td>CIFAR-100 Acc</td>
+                <td>61.6%</td>
+                <td>83.7%</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p data-lang="en">Note: LeJEPA's 83.7% is from transfer learning (trained on ImageNet, evaluated on CIFAR-100), while ours is directly trained on CIFAR-100.</p>
+          <p data-lang="mixed">Note: LeJEPA 的 83.7% 是 transfer learning (在 ImageNet 训练，在 CIFAR-100 eval)，我们是 directly trained on CIFAR-100。</p>
+
+          <h3>PCA Visualization</h3>
+
+          <p data-lang="en">Project 512-dim patch embeddings to 3D (RGB) using PCA. Similar colors = similar features.</p>
+          <p data-lang="mixed">把 512-dim patch embeddings 用 PCA 投影到 3D (RGB)。Similar colors = similar features。</p>
+
+          <figure style="margin: 20px 0;">
+            <img src="images/jepa/pca_comparison.png" alt="PCA comparison between nano and old model" style="max-width: 100%; border-radius: 3px;">
+            <figcaption style="margin-top: 10px; font-size: 0.9em; color: #888;">
+              Left: Original fox (32×32). Middle: Nano model (8×8 patches). Right: Old model (14×14 patches, from 224×224 input).
+            </figcaption>
+          </figure>
+
+          <p data-lang="en">Both models learned to segment foreground/background. The nano model's coarser patches still capture clear semantic boundaries.</p>
+          <p data-lang="mixed">两个模型都学会了 segment foreground/background。Nano model 虽然 patch 更粗，但 semantic boundaries 还是清晰的。</p>
+
+          <hr>
+
+          <h2>5. Head Collapse: Nano vs Old Model</h2>
+
+          <p data-lang="en">We compared attention patterns between two setups:</p>
+          <p data-lang="mixed">我们对比了两个设置的 attention patterns：</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Config</th>
+                <th>Nano Model</th>
+                <th>Old Model</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Image size</td>
+                <td>32×32 (native)</td>
+                <td>224×224 (7× upscaled)</td>
+              </tr>
+              <tr>
+                <td>Tokens</td>
+                <td>64 (8×8)</td>
+                <td>196 (14×14)</td>
+              </tr>
+              <tr>
+                <td>Position encoding</td>
+                <td>RoPE</td>
+                <td>Learned</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Attention Patterns</h3>
+
+          <p data-lang="en"><strong>Nano Model (32×32)</strong> — all 8 heads learned nearly identical patterns (avg similarity: 0.756):</p>
+          <p data-lang="mixed"><strong>Nano Model (32×32)</strong> — 8 个 heads 学到了几乎相同的 pattern (avg similarity: 0.756):</p>
+
+          <img src="images/jepa/nano_fox_attention_heads.png" alt="Nano Attention Heads" style="max-width: 100%; border-radius: 3px; margin: 20px 0;">
+
+          <p data-lang="en"><strong>Old Model (224×224)</strong> — heads are clearly diversified (avg similarity: 0.374):</p>
+          <p data-lang="mixed"><strong>Old Model (224×224)</strong> — heads 明显 diversified (avg similarity: 0.374):</p>
+
+          <img src="images/jepa/old_fox_attention_heads.png" alt="Old Attention Heads" style="max-width: 100%; border-radius: 3px; margin: 20px 0;">
+
+          <h3>Metrics</h3>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Nano 32×32</th>
+                <th>Old 224×224</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Entropy</td>
+                <td>4.08</td>
+                <td>4.97</td>
+              </tr>
+              <tr>
+                <td>Sparsity</td>
+                <td>19%</td>
+                <td>88%</td>
+              </tr>
+              <tr>
+                <td><strong>Head Diversity</strong></td>
+                <td><strong>0.24</strong></td>
+                <td><strong>0.63</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Head Similarity</strong></td>
+                <td><strong>0.756</strong></td>
+                <td><strong>0.374</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Why Head Collapse?</h3>
+
+          <p data-lang="en">Several possible reasons:</p>
+          <p data-lang="mixed">几个可能的原因：</p>
+
+          <ol>
+            <li data-lang="en"><strong>Information per token</strong>: Nano's 4×4 patches have only 16 pixels, while the old model's 16×16 patches have 256 pixels. 16× difference in information, not enough to differentiate.</li>
+            <li data-lang="en"><strong>Attention budget</strong>: 64 tokens give an attention matrix of only 4,096 entries, while 196 tokens give 38,416 entries. More room for heads to specialize.</li>
+            <li data-lang="en"><strong>Training dynamics</strong>: The nano model may collapse to similar patterns early in training and get stuck in a local optimum.</li>
+            <li data-lang="mixed"><strong>Information per token</strong>: Nano 的 4×4 patch 只有 16 pixels，old model 的 16×16 patch 有 256 pixels。信息量差 16×，不够 differentiate。</li>
+            <li data-lang="mixed"><strong>Attention budget</strong>: 64 tokens 的 attention matrix 只有 4,096 entries，196 tokens 有 38,416 entries。更多空间让 heads specialize。</li>
+            <li data-lang="mixed"><strong>Training dynamics</strong>: Nano model 可能 early in training 就 collapse 到 similar patterns，然后 stuck 在 local optimum。</li>
+          </ol>
+
+          <h3>Interesting Finding</h3>
+
+          <p data-lang="en">Despite head collapse, the nano model has better linear probe accuracy (~61.6% vs ~50%). Possible explanations:</p>
+          <p data-lang="mixed">尽管 head collapse，nano model 的 linear probe accuracy 反而更好 (~61.6% vs ~50%)。可能的解释：</p>
+
+          <ul>
+            <li data-lang="en">Head diversity is not necessary for good representations</li>
+            <li data-lang="en">Upscaling small images may introduce artifacts</li>
+            <li data-lang="en">Semantic features at native resolution are more pure</li>
+            <li data-lang="mixed">Head diversity 对 good representations 不是必须的</li>
+            <li data-lang="mixed">Upscaling small images 可能引入 artifacts</li>
+            <li data-lang="mixed">Native resolution 的 semantic features 更 pure</li>
+          </ul>
+
+          <blockquote>
+            <span data-lang="en"><strong>Open question</strong>: If we force head diversity (e.g., through regularization), would the nano model improve? Or is the current behavior optimal for low-resolution inputs?</span>
+            <span data-lang="mixed"><strong>Open question</strong>: 如果 force head diversity (比如加 regularization)，nano model 会更好吗？还是 current behavior 对 low-resolution 是 optimal 的？</span>
+          </blockquote>
+
+          <hr>
+
+          <h2>Conclusion</h2>
+
+          <p data-lang="en">Main findings from this reproduction study:</p>
+          <p data-lang="mixed">这个 reproduction study 的主要 findings：</p>
+
+          <ol>
+            <li data-lang="en"><strong>SIGReg works</strong>: Stable training without contrastive samples</li>
+            <li data-lang="en"><strong>Head collapse</strong>: Nano models on low-resolution images exhibit head collapse</li>
+            <li data-lang="en"><strong>Head collapse ≠ bad representations</strong>: Collapsed heads actually have better linear probe accuracy</li>
+            <li data-lang="en"><strong>Resolution matters</strong>: Native resolution vs upscaling significantly affects attention patterns</li>
+            <li data-lang="mixed"><strong>SIGReg works</strong>: 没有 contrastive samples 也能稳定训练</li>
+            <li data-lang="mixed"><strong>Head collapse</strong>: Nano models 在 low-resolution images 上会出现 head collapse</li>
+            <li data-lang="mixed"><strong>Head collapse ≠ bad representations</strong>: Collapsed heads 反而有更好的 linear probe accuracy</li>
+            <li data-lang="mixed"><strong>Resolution matters</strong>: Native resolution vs upscaling 对 attention patterns 影响很大</li>
+          </ol>
+
+          <hr>
+
+          <h2>References</h2>
+
+          <ul>
+            <li>Balestriero &amp; LeCun — LeJEPA: Provable and Scalable Self-Supervised Learning Without the Heuristics (arXiv 2025)</li>
+            <li>Chen et al. — A Simple Framework for Contrastive Learning of Visual Representations (ICML 2020)</li>
+            <li>Chen &amp; He — Exploring Simple Siamese Representation Learning (CVPR 2021)</li>
+            <li>Grill et al. — Bootstrap Your Own Latent: A New Approach to Self-Supervised Learning (NeurIPS 2020)</li>
+            <li>He et al. — Momentum Contrast for Unsupervised Visual Representation Learning (CVPR 2020)</li>
+            <li>He et al. — Masked Autoencoders Are Scalable Vision Learners (CVPR 2022)</li>
+            <li>Bardes et al. — VICReg: Variance-Invariance-Covariance Regularization (ICLR 2022)</li>
+          </ul>
+
+        </div>
+      </article>
+
+      <footer class="footer">
+        &copy; 2025
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Language switching
+    const langSwitcher = document.getElementById('lang-switcher');
+    langSwitcher?.addEventListener('click', (e) => {
+      if (e.target.classList.contains('lang-btn')) {
+        const lang = e.target.dataset.lang;
+        document.body.className = 'lang-' + lang;
+
+        // Update button states
+        langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+
+        // Save preference
+        localStorage.setItem('post-lang', lang);
+      }
+    });
+
+    // Restore saved language
+    const savedLang = localStorage.getItem('post-lang');
+    if (savedLang) {
+      document.body.className = 'lang-' + savedLang;
+      langSwitcher?.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === savedLang);
+      });
+    }
+
+    // Mobile menu
+    const toggle = document.getElementById('menu-toggle');
+    const navigator = document.getElementById('navigator');
+    const overlay = document.getElementById('nav-overlay');
+
+    toggle?.addEventListener('click', () => {
+      toggle.classList.toggle('active');
+      navigator.classList.toggle('active');
+      overlay.classList.toggle('active');
+      document.body.style.overflow = navigator.classList.contains('active') ? 'hidden' : '';
+    });
+
+    overlay?.addEventListener('click', () => {
+      toggle.classList.remove('active');
+      navigator.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    // Reference tooltips
+    document.querySelectorAll('.ref').forEach(ref => {
+      const tooltip = ref.querySelector('.tooltip');
+      if (!tooltip) return;
+
+      ref.addEventListener('mouseenter', () => {
+        const rect = ref.getBoundingClientRect();
+        tooltip.style.left = rect.left + rect.width / 2 + 'px';
+        tooltip.style.top = rect.top - 8 + 'px';
+        tooltip.style.transform = 'translate(-50%, -100%)';
+      });
+    });
+
+    // Render KaTeX math formulas
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.math').forEach(el => {
+        try {
+          katex.render(el.dataset.formula, el, { throwOnError: false });
+        } catch (e) { console.error(e); }
+      });
+      document.querySelectorAll('.math-display').forEach(el => {
+        try {
+          katex.render(el.dataset.formula, el, { displayMode: true, throwOnError: false });
+        } catch (e) { console.error(e); }
+      });
+
+      // Render diagrams
+      if (typeof renderJEPADiagram === 'function') {
+        renderJEPADiagram('diagram-jepa');
+      }
+      if (typeof renderSimSiamDiagram === 'function') {
+        renderSimSiamDiagram('diagram-simsiam');
+      }
+
+      // Render charts
+      renderTrainingCharts();
+    });
+
+    // Training curves chart
+    async function renderTrainingCharts() {
+      const container = document.getElementById('training-charts');
+      if (!container) return;
+
+      const chartsData = [
+        { src: 'data/lejepa_nano_linear_probe_acc.csv', title: 'Linear Probe Accuracy', color: '#4a9eff' },
+        { src: 'data/lejepa_nano_val_inv.csv', title: 'Invariance Loss', color: '#ff6b6b' },
+        { src: 'data/lejepa_nano_val_sigreg.csv', title: 'SIGReg Loss', color: '#51cf66' }
+      ];
+
+      const grid = document.createElement('div');
+      grid.className = 'charts-grid';
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;';
+
+      let isLog = true;
+      const charts = [];
+
+      for (const chartInfo of chartsData) {
+        try {
+          const response = await fetch(chartInfo.src);
+          const csvText = await response.text();
+          const lines = csvText.trim().split('\n');
+          const labels = [], values = [];
+          for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(s => s.replace(/"/g, '').trim());
+            if (cols.length >= 2) {
+              labels.push(parseFloat(cols[0]));
+              values.push(parseFloat(cols[1]));
+            }
+          }
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'chart-wrapper';
+          const canvas = document.createElement('canvas');
+          wrapper.appendChild(canvas);
+          grid.appendChild(wrapper);
+
+          const chart = new Chart(canvas, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: chartInfo.title,
+                data: values,
+                borderColor: chartInfo.color,
+                backgroundColor: chartInfo.color + '20',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 0,
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: { legend: { display: true, position: 'top' } },
+              scales: {
+                x: { type: 'logarithmic', title: { display: true, text: 'Step' }, ticks: { maxTicksLimit: 6 } },
+                y: { type: 'logarithmic', title: { display: true, text: chartInfo.title } }
+              }
+            }
+          });
+          charts.push(chart);
+        } catch (e) {
+          console.error('Failed to load chart:', chartInfo.src, e);
+        }
+      }
+
+      container.innerHTML = '';
+      container.appendChild(grid);
+
+      // Add toggle
+      const toggleDiv = document.createElement('div');
+      toggleDiv.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-bottom:1rem;';
+      toggleDiv.innerHTML = `
+        <button id="log-btn" style="padding:6px 12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:3px;color:#f5f5f5;cursor:pointer;font-size:12px;">Log</button>
+        <button id="linear-btn" style="padding:6px 12px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:3px;color:#666;cursor:pointer;font-size:12px;">Linear</button>
+      `;
+      container.insertBefore(toggleDiv, grid);
+
+      document.getElementById('log-btn')?.addEventListener('click', () => {
+        if (isLog) return;
+        isLog = true;
+        charts.forEach(c => { c.options.scales.x.type = 'logarithmic'; c.options.scales.y.type = 'logarithmic'; c.update(); });
+        document.getElementById('log-btn').style.background = 'rgba(255,255,255,0.1)';
+        document.getElementById('log-btn').style.color = '#f5f5f5';
+        document.getElementById('linear-btn').style.background = 'transparent';
+        document.getElementById('linear-btn').style.color = '#666';
+      });
+      document.getElementById('linear-btn')?.addEventListener('click', () => {
+        if (!isLog) return;
+        isLog = false;
+        charts.forEach(c => { c.options.scales.x.type = 'linear'; c.options.scales.y.type = 'linear'; c.update(); });
+        document.getElementById('linear-btn').style.background = 'rgba(255,255,255,0.1)';
+        document.getElementById('linear-btn').style.color = '#f5f5f5';
+        document.getElementById('log-btn').style.background = 'transparent';
+        document.getElementById('log-btn').style.color = '#666';
+      });
+    }
+  </script>
+</body>
+</html>

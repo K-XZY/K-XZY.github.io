@@ -168,9 +168,11 @@ function renderPosts() {
 
   container.innerHTML = filtered.map(post => {
     const version = getPostVersion(post);
+    // Use direct HTML link if available, otherwise use markdown renderer
+    const href = post.html ? post.html : `post.html?slug=${post.slug}&lang=${currentLang}`;
 
     return `
-      <a href="post.html?slug=${post.slug}&lang=${currentLang}" class="post">
+      <a href="${href}" class="post">
         <div class="post-title">${escapeHtml(version.title)}</div>
         <div class="post-meta">${formatDate(post.date)}</div>
         ${version.summary ? `<p class="post-summary">${escapeHtml(version.summary)}</p>` : ''}

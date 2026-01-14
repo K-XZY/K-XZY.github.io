@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chart Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <h1>Testing Marked.js output</h1>
+  <pre id="output"></pre>
+  <script>
+    const md = `\`\`\`chart
+src="posts/data/lejepa_nano_linear_probe_acc.csv" title="Linear Probe Accuracy" color="#4a9eff"
+\`\`\``;
+
+    const html = marked.parse(md);
+    document.getElementById('output').textContent = html;
+    console.log('Marked output:', html);
+  </script>
+</body>
+</html>

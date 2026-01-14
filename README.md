@@ -219,28 +219,33 @@ summary: A personal guide on reading academic papers.
 
 ### Git 仓库
 
-本网站有独立的 Git 仓库，与 research-notes 父目录分开管理：
+本网站有两个 remote，实现开发与发布分离：
 
 ```bash
-# 网站仓库
-origin: git@github.com:K-XZY/kevinxie-website.git
-
-# 注意：不要 push 到父目录的 research-notes repo
+origin:  git@github.com:K-XZY/kevinxie-website.git   # 私有开发仓库
+publish: git@github.com:K-XZY/K-XZY.github.io.git    # 公开发布仓库 → https://k-xzy.github.io
 ```
 
 ### 发布流程
 
 ```bash
-# 1. 发布新文章
+# 1. 生成文章索引
 python build.py
 
-# 2. 提交并推送到网站仓库
-cd Presentation/website
-git add . && git commit -m "Add new post" && git push origin main
-
-# 本地预览
+# 2. 本地预览
 python -m http.server 8000
+
+# 3. 提交更改
+git add . && git commit -m "Your message"
+
+# 4. 推送到开发仓库（私有，不影响线上）
+git push origin main
+
+# 5. 准备好后，发布到线上
+git push publish main
 ```
+
+**注意**：不要 push 到父目录的 research-notes repo
 
 ---
 
@@ -252,7 +257,7 @@ python -m http.server 8000
 - [ ] 实现 JadeRegent 配色 CSS
 - [ ] 文章列表、Tag 过滤、搜索
 - [ ] Markdown 渲染 + KaTeX
-- [ ] 部署到 GitHub Pages
+- [x] 部署到 GitHub Pages
 
 ### Phase 2: 内容迁移
 

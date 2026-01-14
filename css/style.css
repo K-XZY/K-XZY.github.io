@@ -938,3 +938,48 @@ body {
   text-align: center;
   padding: 2rem;
 }
+
+/* Reference citation button */
+.ref-cite {
+  display: inline-block;
+  color: var(--accent);
+  background: rgba(160, 140, 91, 0.1);
+  border: 1px solid rgba(160, 140, 91, 0.3);
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: 0.85em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  vertical-align: baseline;
+}
+
+.ref-cite:hover {
+  color: var(--text-primary);
+  background: rgba(160, 140, 91, 0.2);
+  border-color: var(--accent);
+}
+
+/* Reference tooltip (real DOM element) */
+.ref-tooltip {
+  position: fixed;
+  z-index: 10000;
+  background: var(--elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s;
+}
+
+.ref-tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+}

@@ -1,14 +1,30 @@
 {
   "posts": [
     {
-      "slug": "exploring-jepa-sigreg",
-      "date": "2026-01-13",
+      "slug": "discrete-visual-tokenizers",
+      "date": "2025-12-14",
       "tags": [
-        "deep-learning",
-        "self-supervised",
-        "representation-learning",
-        "JEPA"
+        "self-supervised-learning",
+        "computer-vision"
       ],
+      "html": "posts/discrete-visual-tokenizers.html",
+      "versions": {
+        "original": {
+          "title": "Discrete Visual Tokenizers",
+          "summary": "Exploring discrete visual tokenizers for GUI world modeling — from VQ-VAE limitations to Infinity Tokenizer, and the trade-offs we encountered.",
+          "file": "posts/discrete-visual-tokenizers.md"
+        }
+      }
+    },
+    {
+      "slug": "exploring-jepa-sigreg",
+      "date": "2025-12-25",
+      "tags": [
+        "self-supervised-learning",
+        "representation-learning",
+        "computer-vision"
+      ],
+      "html": "posts/exploring-jepa-sigreg.html",
       "versions": {
         "original": {
           "title": "Exploring JEPA and SIGReg",
@@ -21,9 +37,7 @@
       "slug": "how-to-read-a-paper",
       "date": "2025-01-05",
       "tags": [
-        "research",
-        "methodology",
-        "reading"
+        "methodology"
       ],
       "versions": {
         "original": {
@@ -32,58 +46,16 @@
           "file": "posts/how-to-read-a-paper.md"
         }
       }
-    },
-    {
-      "slug": "vision-transformer",
-      "date": "2025-01-04",
-      "tags": [
-        "deep-learning",
-        "vision",
-        "transformer",
-        "architecture"
-      ],
-      "versions": {
-        "original": {
-          "title": "Vision Transformer",
-          "summary": "From first principles - what symmetry does ViT encode, and when does it beat CNNs?",
-          "file": "posts/vision-transformer.md"
-        }
-      }
-    },
-    {
-      "slug": "information-theory-foundations",
-      "date": "2025-01-03",
-      "tags": [
-        "information-theory",
-        "math",
-        "foundations"
-      ],
-      "versions": {
-        "original": {
-          "title": "Foundations of Information Theory",
-          "summary": "Self-information, entropy, mutual information, and KL divergence — the core concepts.",
-          "file": "posts/information-theory-foundations.md"
-        }
-      }
     }
   ],
   "languages": [
     "original"
   ],
   "tags": [
-    "JEPA",
-    "architecture",
-    "deep-learning",
-    "foundations",
-    "information-theory",
-    "math",
+    "computer-vision",
     "methodology",
-    "reading",
     "representation-learning",
-    "research",
-    "self-supervised",
-    "transformer",
-    "vision"
+    "self-supervised-learning"
   ],
-  "generated_at": "2026-01-13T02:09:33.145636"
+  "generated_at": "2026-01-13T12:00:00.000000"
 }
