@@ -223,9 +223,10 @@ def inject_static_content(index_path: Path, config: dict, posts_index: dict):
     links_html = ' · '.join(links_parts) if links_parts else ''
 
     html_content = re.sub(
-        r'<div class="links" id="social-links"></div>',
+        r'<div class="links" id="social-links">.*?</div>',
         f'<div class="links" id="social-links">{links_html}</div>',
-        html_content
+        html_content,
+        flags=re.DOTALL
     )
 
     # 3. Inject posts list
@@ -262,9 +263,10 @@ def inject_static_content(index_path: Path, config: dict, posts_index: dict):
     posts_html = '\n'.join(posts_html_parts) if posts_html_parts else '<p>No posts yet.</p>'
 
     html_content = re.sub(
-        r'<div class="posts-list" id="posts-list"></div>',
+        r'<div class="posts-list" id="posts-list">.*?</div>',
         f'<div class="posts-list" id="posts-list">\n{posts_html}\n      </div>',
-        html_content
+        html_content,
+        flags=re.DOTALL
     )
 
     # Write back
