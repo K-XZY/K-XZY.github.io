@@ -338,8 +338,12 @@ publish: git@github.com:K-XZY/K-XZY.github.io.git    # 公开发布仓库 → ht
 ### 发布流程
 
 ```bash
-# 1. 生成文章索引
+# 1. 生成文章索引和静态内容（自动化）
 python build.py
+# 这个命令会：
+# - 扫描 posts/*.html 提取元数据
+# - 生成 posts.json 和 config.json
+# - 自动注入静态 HTML 到 index.html（用于 SEO）
 
 # 2. 本地预览
 python -m http.server 8000
@@ -354,7 +358,10 @@ git push origin main
 git push publish main
 ```
 
-**注意**：不要 push 到父目录的 research-notes repo
+**重要提示**：
+- ✅ `build.py` 会自动更新 `index.html` 的静态内容，无需手动编辑
+- ✅ 每次添加新文章后，只需运行 `python build.py` 即可
+- ❌ 不要 push 到父目录的 research-notes repo
 
 ---
 
@@ -413,6 +420,35 @@ python build.py
 
 ## SEO Optimization
 
+### Progressive Enhancement Strategy
+
+The website uses a **dual-structure progressive enhancement** approach for SEO:
+
+**How it works:**
+1. **Static HTML** (for crawlers): `build.py` injects SEO-friendly content into `index.html`
+   - Structure: `<article class="post-item">` with `<h3>` titles
+   - Crawlers see full content: bio, links, and all posts with metadata
+2. **Dynamic HTML** (for users): JavaScript completely replaces the static content
+   - Structure: `<a class="post">` with `<div>` titles
+   - Users get interactive features: search, filtering, language switching
+3. **Seamless swap**: JavaScript does a full `innerHTML` replacement on page load
+   - Target: `<div id="posts-list">` serves as the anchor point
+   - `build.py` injects static HTML inside this div
+   - `js/main.js` finds this div by ID and replaces all its contents
+   - No need to match structures perfectly - complete replacement
+
+**Key files:**
+- `build.py` → `inject_static_content()` function generates static HTML
+- `js/main.js` → `renderPosts()` function replaces with dynamic version
+- Both read from `posts.json` and `config.json`
+- Critical anchor: `id="posts-list"` (must match in both HTML and code)
+
+**Benefits:**
+- ✅ Crawlers index full content (better SEO)
+- ✅ Users get modern interactive experience
+- ✅ No visual mismatch (complete replacement)
+- ✅ Simple to maintain (two independent structures)
+
 ### Implemented
 - [x] Google Site Verification meta tag
 - [x] Meta descriptions for all pages
@@ -420,6 +456,7 @@ python build.py
 - [x] Open Graph and Twitter Card tags
 - [x] Sitemap.xml
 - [x] robots.txt
+- [x] Progressive enhancement for crawler indexing
 
 ### Quick Wins (To Implement)
 2. **Structured data**: Implement Schema.org JSON-LD for Article and Person types to enable rich snippets.

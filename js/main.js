@@ -171,6 +171,7 @@ function renderPosts() {
     return;
   }
 
+  // Completely replace static HTML with dynamic version
   container.innerHTML = filtered.map(post => {
     const version = getPostVersion(post);
     // Use direct HTML link from version.file (HTML-only workflow)
