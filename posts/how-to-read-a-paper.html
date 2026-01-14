@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Read a Paper</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* Reference button */
+    .ref {
+      display: inline-block;
+      color: var(--accent);
+      background: rgba(160, 140, 91, 0.1);
+      border: 1px solid rgba(160, 140, 91, 0.3);
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      user-select: none;
+    }
+
+    .ref:hover {
+      color: var(--text-primary);
+      background: rgba(160, 140, 91, 0.2);
+      border-color: var(--accent);
+    }
+
+    /* Tooltip */
+    .ref .tooltip {
+      position: fixed;
+      background: #1a1c1a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #ccc;
+      white-space: normal;
+      width: max-content;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s, visibility 0.15s;
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    .ref:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Language switching - only hide content elements, not buttons */
+    .post-content [data-lang] {
+      display: none !important;
+    }
+
+    /* English mode */
+    body.lang-en .post-content [data-lang="en"] {
+      display: block !important;
+    }
+
+    body.lang-en .post-content p[data-lang="en"] {
+      display: block !important;
+    }
+
+    body.lang-en .post-content li[data-lang="en"] {
+      display: list-item !important;
+    }
+
+    body.lang-en .post-content span[data-lang="en"] {
+      display: inline !important;
+    }
+
+    /* Mixed mode */
+    body.lang-mixed .post-content [data-lang="mixed"] {
+      display: block !important;
+    }
+
+    body.lang-mixed .post-content p[data-lang="mixed"] {
+      display: block !important;
+    }
+
+    body.lang-mixed .post-content li[data-lang="mixed"] {
+      display: list-item !important;
+    }
+
+    body.lang-mixed .post-content span[data-lang="mixed"] {
+      display: inline !important;
+    }
+  </style>
+</head>
+
+<body class="lang-en">
+  <div class="layout">
+    <!-- Navigator -->
+    <nav class="navigator" id="navigator">
+      <div class="nav-section">
+        <div class="nav-links">
+          <a href="../index.html" class="nav-link">
+            <span class="nav-icon">&#8962;</span>
+            <span>Home</span>
+          </a>
+          <a href="../index.html#posts" class="nav-link active">
+            <span class="nav-icon">&#9998;</span>
+            <span>Blog</span>
+          </a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-lang" id="lang-switcher">
+          <button class="lang-btn" data-lang="mixed">X</button>
+          <button class="lang-btn active" data-lang="en">EN</button>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-history">
+          <button class="history-btn" onclick="history.back()">&larr;</button>
+          <button class="history-btn" onclick="history.forward()">&rarr;</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+      <span class="menu-icon"></span>
+    </button>
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main">
+      <article class="post-page">
+        <header class="post-page-header">
+          <h1 class="post-page-title">How to Read a Paper</h1>
+          <div class="post-page-meta">January 5, 2025</div>
+          <div class="post-page-tags">
+            <span class="post-tag">methodology</span>
+          </div>
+        </header>
+
+        <div class="post-content">
+          <blockquote>
+            <span data-lang="en">A personal guide on reading academic papers effectively, focusing on insights and active thinking.</span>
+            <span data-lang="mixed">A personal guide on reading academic papers effectively, focusing on insights and active thinking.</span>
+          </blockquote>
+
+          <p data-lang="en">Step one is always to read the abstract to know:</p>
+          <p data-lang="mixed">Step one is always to read the abstract to know:</p>
+
+          <ol>
+            <li data-lang="en">What problem are they tackling.</li>
+            <li data-lang="en">How are they benchmarking themselves?</li>
+            <li data-lang="en">How do they solve the problem and beat the sucker (prior work) on what aspect by how much?</li>
+            <li data-lang="mixed">What problem are they tackling.</li>
+            <li data-lang="mixed">How are they benchmarking themselves?</li>
+            <li data-lang="mixed">How do they solve the problem and beat the sucker (prior work) on what aspect by how much?</li>
+          </ol>
+
+          <p data-lang="en">Step two is to see if the code and data is public.</p>
+          <p data-lang="mixed">Step two is to see if the code and data is public.</p>
+
+          <p data-lang="en">Step three, know what you want! (New method? Just some insight? Pure exploration? Wanting to find a good benchmark? Or a sucker to kick?)</p>
+          <p data-lang="mixed">Step three, know what you want! (New method? just some insight? pure exploration? wanting to find a good benchmark? or a sucker to kick?)</p>
+
+          <hr>
+
+          <h2>Reading for Insights</h2>
+
+          <p data-lang="en">Pay attention to when the authors explain <strong>why</strong>. For example:</p>
+          <p data-lang="mixed">要注意找作者解释为什么的时候. 比如说:</p>
+
+          <ul>
+            <li data-lang="en"><strong>VL-JEPA</strong>: The authors explain why continuous features are used, and briefly explain why this makes learning simpler.</li>
+            <li data-lang="en"><strong>Attention is All You Need</strong>: The authors explain from the perspective of information propagation distance why attention is used instead of traditional recurrent architectures.</li>
+            <li data-lang="en"><strong>Infinity</strong>: The authors explain why using BSQ or LFQ can achieve an infinite token effect.</li>
+            <li data-lang="mixed"><strong>VL-JEPA</strong>: 作者解释了为什么要使用continuous feature？以及稍微解释了为什么这样让学习变得更简单。</li>
+            <li data-lang="mixed"><strong>Attention is all you need</strong>: 作者从信息传播距离的角度上解释了，为什么要使用 attention,而不是传统的Recurrent Architecture。</li>
+            <li data-lang="mixed"><strong>Infinity</strong>: 作者解释了，为什么使用了BSQ或者LFQ就可以达到一个无限token的一个效果。</li>
+          </ul>
+
+          <p data-lang="en">Also pay attention to what the authors <strong>don't explain</strong>, and why they don't. There are several possibilities:</p>
+          <p data-lang="mixed">还要注意作者没解释什么. 以及为什么没解释。有几种可能：</p>
+
+          <ul>
+            <li data-lang="en">It doesn't sound good to say it out loud → Potential opportunities and pitfalls!</li>
+            <li data-lang="en">They don't know either, just relying on intuition → Take note.</li>
+            <li data-lang="en">They think it's common sense or knowledge everyone knows → Ask Claude!</li>
+            <li data-lang="mixed">说来不好听。→ 潜在的机会和pitfall！</li>
+            <li data-lang="mixed">他也不知道，就靠intuition。→ 记下来。</li>
+            <li data-lang="mixed">他觉得是个common sense或者大家都懂的知识。→ 问Claude!</li>
+          </ul>
+
+          <hr>
+
+          <h2>Active Thinking for Understanding</h2>
+
+          <p data-lang="en">It is easy to know <strong>How does it do it</strong>, than understanding <strong>What does it do</strong> and <strong>Why does that 'how' do a 'what'</strong>.</p>
+          <p data-lang="mixed">It is easy to know <strong>How does it do it</strong>, than understanding <strong>What does it do</strong> and <strong>Why does that 'how' do a 'what'</strong>.</p>
+
+          <p data-lang="en">Similarly, prioritize <strong>understanding the nature of the problem</strong>, rather than the algorithm.</p>
+          <p data-lang="mixed">Similarly, prioritize <strong>understanding the nature of the problem</strong>, rather than the algorithm.</p>
+
+          <p data-lang="en">Finally, always think about <strong>so what? or then what?</strong> This is when you realize a known problem can finally maybe be solved!</p>
+          <p data-lang="mixed">Finally, always think about <strong>so what? or then what?</strong> This is when you realize a known problems can finally maybe be solved!</p>
+
+          <h3>Example: VQ-GAN vs JEPA</h3>
+
+          <ul>
+            <li data-lang="en"><strong>VQ-GAN latent space + Transformer = MASKGiT = MASKViT</strong>: They can generate images by iterating over the latent codebook.</li>
+            <li data-lang="en"><strong>JEPA encoder latent space + Transformer = JEPA + Decoder</strong>: They can generate images too by iterating over the latent continuous vectors.</li>
+            <li data-lang="mixed"><strong>VQ-GAN latent space + Transformer = MASKGiT = MASKViT</strong>; They can generate images by iterating over the latent codebook.</li>
+            <li data-lang="mixed"><strong>JEPA encoder latent space + Transformer = JEPA</strong>; Add a Decoder. They can generate images too by iterating over the latent continuous vectors.</li>
+          </ul>
+
+          <p data-lang="en">They appear to be doing the same thing. But they're actually not!</p>
+          <p data-lang="mixed">看起来两个方法在做同样的事情。但其实并不是!</p>
+
+          <ol>
+            <li data-lang="en"><strong>MASKViT</strong>: The encoder only encodes appearance for reconstruction. The Transformer Predictor learns semantics + reasoning + understanding appearance for image generation.</li>
+            <li data-lang="en"><strong>JEPA</strong>: The encoder primarily learns semantics. The predictor handles reasoning!</li>
+            <li data-lang="mixed"><strong>MASKViT</strong>: Encoder只负责编码外观,以便于Reconstruction. Transformer Predictor负责学习Semantics + 推理Reasoning+理解外观用于生成图片.</li>
+            <li data-lang="mixed"><strong>JEPA</strong>: Encoder主要学习Semantics。Predictor负责推理Reasoning！</li>
+          </ol>
+
+          <hr>
+
+          <h2>Reading for Re-production</h2>
+
+          <p data-lang="en">Sometimes, we just want to use a method on a new dataset. In this case, we only need to know a few things well:</p>
+          <p data-lang="mixed">Sometimes, we just want to use a method on new dataset. In this case, we only need to know a few things well:</p>
+
+          <ol>
+            <li data-lang="en">How much compute did they use? <code>GPU type x Hour x node count</code></li>
+            <li data-lang="en">What dataset did they use and how big is it?</li>
+            <li data-lang="en">How and why does the model do well on this dataset?</li>
+            <li data-lang="mixed">How much compute did they use? <code>GPU type x Hour x node count</code></li>
+            <li data-lang="mixed">What dataset did they use and how big is it?</li>
+            <li data-lang="mixed">How and why does the model do well on this dataset?</li>
+          </ol>
+
+          <hr>
+
+          <h2>What Makes a Great Paper</h2>
+
+          <blockquote>
+            <span data-lang="en">It's not enough to be enough.</span>
+            <span data-lang="mixed">It's not enough to be enough.</span>
+          </blockquote>
+
+          <p data-lang="en">A good paper doesn't necessarily need massive compute or extremely high scores. But it must have:</p>
+          <p data-lang="mixed">好的论文并不一定需要巨大的算力或者过高的跑分。但必须有：</p>
+
+          <ol>
+            <li data-lang="en"><strong>Clear insights</strong>: After reading, others must gain some understanding</li>
+            <li data-lang="en"><strong>Concise methods</strong>: One more module is unnecessary, one less parameter and it doesn't work</li>
+            <li data-lang="en"><strong>Reproducible</strong>: Such as clean open-source code and open data</li>
+            <li data-lang="mixed">明确的insight，别人看完一定要在理解上有所收获</li>
+            <li data-lang="mixed">精简的方法，多一个模块没必要，少一个参数就跑不成</li>
+            <li data-lang="mixed">可复制，比如代码清晰的开源，数据开源</li>
+          </ol>
+
+        </div>
+      </article>
+
+      <footer class="footer">
+        &copy; 2025
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Language switching
+    const langSwitcher = document.getElementById('lang-switcher');
+    langSwitcher?.addEventListener('click', (e) => {
+      if (e.target.classList.contains('lang-btn')) {
+        const lang = e.target.dataset.lang;
+        document.body.className = 'lang-' + lang;
+
+        // Update button states
+        langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+
+        // Save preference
+        localStorage.setItem('post-lang', lang);
+      }
+    });
+
+    // Restore saved language
+    const savedLang = localStorage.getItem('post-lang');
+    if (savedLang) {
+      document.body.className = 'lang-' + savedLang;
+      langSwitcher?.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === savedLang);
+      });
+    }
+
+    // Mobile menu
+    const toggle = document.getElementById('menu-toggle');
+    const navigator = document.getElementById('navigator');
+    const overlay = document.getElementById('nav-overlay');
+
+    toggle?.addEventListener('click', () => {
+      toggle.classList.toggle('active');
+      navigator.classList.toggle('active');
+      overlay.classList.toggle('active');
+      document.body.style.overflow = navigator.classList.contains('active') ? 'hidden' : '';
+    });
+
+    overlay?.addEventListener('click', () => {
+      toggle.classList.remove('active');
+      navigator.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    // Reference tooltips
+    document.querySelectorAll('.ref').forEach(ref => {
+      const tooltip = ref.querySelector('.tooltip');
+      if (!tooltip) return;
+
+      ref.addEventListener('mouseenter', () => {
+        const rect = ref.getBoundingClientRect();
+        tooltip.style.left = rect.left + rect.width / 2 + 'px';
+        tooltip.style.top = rect.top - 8 + 'px';
+        tooltip.style.transform = 'translate(-50%, -100%)';
+      });
+    });
+  </script>
+</body>
+
+</html>

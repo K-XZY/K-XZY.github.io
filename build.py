@@ -6,47 +6,100 @@ Usage:
     python build.py
 """
 
-import os
 import re
 import json
 import yaml
 from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
+from html.parser import HTMLParser
+from typing import Optional
 
 
-def parse_front_matter(content: str) -> tuple[dict, str]:
-    """Parse YAML front matter from markdown content."""
-    pattern = r'^---\n(.*?)\n---\n'
-    match = re.match(pattern, content, re.DOTALL)
+class PostMetadataParser(HTMLParser):
+    """Extract metadata from HTML post files."""
 
-    if not match:
-        return {}, content
+    def __init__(self):
+        super().__init__()
+        self.title = ""
+        self.date = ""
+        self.tags = []
+        self.summary = ""
 
-    front_matter_str = match.group(1)
-    body = content[match.end():]
+        self._in_title = False
+        self._in_meta = False
+        self._in_tags = False
+        self._in_blockquote = False
+        self._tag_class = None
 
-    # Simple YAML parsing
-    front_matter = {}
-    for line in front_matter_str.split('\n'):
-        line = line.strip()
-        if not line or ':' not in line:
-            continue
+    def handle_starttag(self, tag, attrs):
+        attrs_dict = dict(attrs)
+        class_attr = attrs_dict.get('class', '')
 
-        key, value = line.split(':', 1)
-        key = key.strip()
-        value = value.strip()
+        if class_attr and 'post-page-title' in class_attr:
+            self._in_title = True
+        elif class_attr and 'post-page-meta' in class_attr:
+            self._in_meta = True
+        elif class_attr and 'post-page-tags' in class_attr:
+            self._in_tags = True
+        elif tag == 'blockquote' and not self.summary:
+            self._in_blockquote = True
+        elif tag == 'span' and class_attr and 'post-tag' in class_attr and self._in_tags:
+            self._tag_class = True
 
-        # Handle arrays: [tag1, tag2, tag3]
-        if value.startswith('[') and value.endswith(']'):
-            items = value[1:-1].split(',')
-            value = [item.strip().strip('"\'') for item in items if item.strip()]
-        else:
-            value = value.strip('"\'')
+    def handle_endtag(self, tag):
+        if tag == 'h1':
+            self._in_title = False
+        elif tag == 'div':
+            self._in_meta = False
+            self._in_tags = False
+        elif tag == 'blockquote':
+            self._in_blockquote = False
+        elif tag == 'span':
+            self._tag_class = False
 
-        front_matter[key] = value
+    def handle_data(self, data):
+        data = data.strip()
+        if not data:
+            return
 
-    return front_matter, body
+        if self._in_title:
+            self.title = data
+        elif self._in_meta:
+            self.date = data
+        elif self._tag_class and self._in_tags:
+            self.tags.append(data)
+        elif self._in_blockquote and not self.summary:
+            self.summary = data
+
+
+def parse_html_post(html_path: Path) -> Optional[dict]:
+    """Parse metadata from HTML post file."""
+    try:
+        content = html_path.read_text(encoding='utf-8')
+        parser = PostMetadataParser()
+        parser.feed(content)
+
+        # Parse date to YYYY-MM-DD format
+        date = datetime.now().strftime('%Y-%m-%d')
+
+        # Try to parse common date formats
+        for fmt in ['%B %d, %Y', '%Y-%m-%d', '%d %B %Y']:
+            try:
+                date = datetime.strptime(parser.date, fmt).strftime('%Y-%m-%d')
+                break
+            except ValueError:
+                continue
+
+        return {
+            'title': parser.title or html_path.stem,
+            'date': date,
+            'tags': parser.tags,
+            'summary': parser.summary
+        }
+    except Exception as e:
+        print(f"  Error parsing {html_path.name}: {e}")
+        return None
 
 
 def slugify(text: str) -> str:
@@ -59,36 +112,10 @@ def slugify(text: str) -> str:
     return slug
 
 
-def parse_filename(filename: str) -> tuple[str, str]:
-    """
-    Parse filename to extract slug and language.
-
-    Examples:
-        how-to-read.md -> ('how-to-read', 'original')
-        how-to-read.en.md -> ('how-to-read', 'en')
-        how-to-read.zh.md -> ('how-to-read', 'zh')
-    """
-    stem = filename.rsplit('.md', 1)[0]
-
-    # Check for language suffix
-    for lang in ['en', 'zh', 'ja']:
-        if stem.endswith(f'.{lang}'):
-            slug = stem.rsplit(f'.{lang}', 1)[0]
-            return slug, lang
-
-    return stem, 'original'
-
-
 def build_posts_index(posts_dir: Path) -> dict:
-    """Build index from all markdown files in posts directory."""
-    posts_by_slug = defaultdict(lambda: {
-        'slug': '',
-        'date': '',
-        'tags': [],
-        'versions': {}
-    })
+    """Build index from all HTML files in posts directory."""
+    posts = []
     all_tags = set()
-    languages_found = {'original'}
 
     if not posts_dir.exists():
         print(f"Warning: {posts_dir} does not exist")
@@ -99,58 +126,45 @@ def build_posts_index(posts_dir: Path) -> dict:
             "generated_at": datetime.now().isoformat()
         }
 
-    for md_file in sorted(posts_dir.glob('*.md')):
-        print(f"Processing: {md_file.name}")
+    # Scan HTML files only (ignore deprecated MD files)
+    for html_file in sorted(posts_dir.glob('*.html')):
+        print(f"Processing: {html_file.name}")
 
-        content = md_file.read_text(encoding='utf-8')
-        front_matter, body = parse_front_matter(content)
-
-        if 'title' not in front_matter:
-            print(f"  Skipping: no title found")
+        metadata = parse_html_post(html_file)
+        if not metadata:
+            print(f"  Skipping: failed to parse metadata")
             continue
 
-        slug, lang = parse_filename(md_file.name)
-        languages_found.add(lang)
+        slug = html_file.stem
 
-        # Extract fields
-        title = front_matter.get('title', md_file.stem)
-        date = front_matter.get('date', datetime.now().strftime('%Y-%m-%d'))
-        tags = front_matter.get('tags', [])
-        summary = front_matter.get('summary', '')
-
-        if isinstance(tags, str):
-            tags = [tags]
-
-        # Update post entry
-        post = posts_by_slug[slug]
-        post['slug'] = slug
-
-        # Use date from original or first version found
-        if lang == 'original' or not post['date']:
-            post['date'] = date
-            post['tags'] = tags
-
-        # Add version
-        post['versions'][lang] = {
-            'title': title,
-            'summary': summary,
-            'file': f'posts/{md_file.name}'
+        # Build post entry
+        post_entry = {
+            'slug': slug,
+            'date': metadata['date'],
+            'tags': metadata['tags'],
+            'versions': {
+                'original': {
+                    'title': metadata['title'],
+                    'summary': metadata['summary'],
+                    'file': f'posts/{html_file.name}'
+                }
+            }
         }
 
-        all_tags.update(tags)
+        posts.append(post_entry)
+        all_tags.update(metadata['tags'])
 
-    # Convert to list and sort by date
-    posts = list(posts_by_slug.values())
+        print(f"  ✓ Title: {metadata['title']}")
+        print(f"  ✓ Date: {metadata['date']}")
+        print(f"  ✓ Tags: {', '.join(metadata['tags'])}")
+
+    # Sort by date (newest first)
     posts.sort(key=lambda p: p['date'], reverse=True)
-
-    # Sort languages and tags
-    languages = ['original'] + sorted([l for l in languages_found if l != 'original'])
-    all_tags = sorted(all_tags)
 
     return {
         'posts': posts,
-        'languages': languages,
-        'tags': all_tags,
+        'languages': ['original'],
+        'tags': sorted(all_tags),
         'generated_at': datetime.now().isoformat()
     }
 

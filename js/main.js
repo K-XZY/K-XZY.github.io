@@ -168,8 +168,8 @@ function renderPosts() {
 
   container.innerHTML = filtered.map(post => {
     const version = getPostVersion(post);
-    // Use direct HTML link if available, otherwise use markdown renderer
-    const href = post.html ? post.html : `post.html?slug=${post.slug}&lang=${currentLang}`;
+    // Use direct HTML link from version.file (HTML-only workflow)
+    const href = version.file || `posts/${post.slug}.html`;
 
     return `
       <a href="${href}" class="post">

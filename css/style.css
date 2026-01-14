@@ -151,6 +151,7 @@ body {
   border-radius: var(--radius);
   transition: all 0.15s;
   min-width: 24px;
+  position: relative;
 }
 
 .lang-btn:hover {
@@ -160,6 +161,33 @@ body {
 .lang-btn.active {
   color: var(--text-secondary);
   background: rgba(255,255,255,0.04);
+}
+
+/* Language tooltip */
+.lang-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: -32px;
+  transform: translateX(-50%);
+  background: #1a1c1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #ccc;
+  white-space: nowrap;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.lang-btn:hover .lang-tooltip {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* History Navigation */

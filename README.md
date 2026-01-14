@@ -116,10 +116,10 @@
 | 技术          | 选择                         | 理由                    |
 | ------------- | ---------------------------- | ----------------------- |
 | 前端          | HTML + CSS + JavaScript      | 纯静态，简单可控        |
-| 内容格式      | Markdown + YAML front matter | 易于编写和维护          |
+| 内容格式      | **HTML**                     | 直接控制，支持复杂交互  |
 | 数学公式      | KaTeX                        | 比 MathJax 更快         |
-| Markdown 渲染 | marked.js (浏览器端)         | 无需构建步骤            |
-| 索引生成      | Python 脚本                  | 扫描文章生成 posts.json |
+| 图表可视化    | Chart.js / D3.js             | 交互式数据可视化        |
+| 索引生成      | Python 脚本 (build.py)       | 扫描 HTML 生成 posts.json |
 | 部署          | GitHub Pages                 | 免费、简单              |
 
 ---
@@ -129,7 +129,7 @@
 ```
 website/
 ├── index.html          # 首页
-├── post.html           # 文章阅读页
+├── post.html           # 文章阅读页（已弃用，现在直接用 HTML）
 ├── cv.html             # CV 页面（可选）
 │
 ├── design-proposals.html  # 设计预览（开发用）
@@ -137,18 +137,25 @@ website/
 ├── config.yaml         # 个人信息配置
 ├── config.json         # build.py 生成
 │
-├── posts/              # Markdown 博客文章
-│   └── *.md
+├── posts/              # ✅ HTML 博客文章（唯一发布源）
+│   ├── *.html          # 会被索引并发布
+│   ├── images/         # 文章图片资源
+│   └── data/           # 文章数据文件
+│
+├── drafts/             # ❌ Markdown 草稿（不会被发布）
+│   └── *.md            # 仅作为参考/模板
+│
 ├── posts.json          # 自动生成的文章索引
 │
 ├── css/style.css       # 主样式
-├── js/main.js          # 首页逻辑
-├── js/post.js          # 文章页逻辑
+├── js/
+│   ├── main.js         # 首页逻辑
+│   ├── post.js         # Markdown 渲染（已弃用）
+│   └── diagrams.js     # D3 图表工具
 │
 ├── photos/             # 头像
-├── assets/images/      # 文章图片
 │
-├── build.py            # 索引生成脚本
+├── build.py            # 索引生成脚本（仅扫描 HTML）
 └── README.md
 ```
 
@@ -194,21 +201,51 @@ research_interests:
 
 ## 文章格式
 
-### 多语言支持
+### HTML-Only Workflow ⭐
 
-有两种方式实现多语言：
+**所有博客文章都应该是 HTML 文件**，放在 `posts/` 目录下。
 
-#### 方式一：多文件（Markdown 文章）
+工作流程：
+1. **草稿阶段**: 在 `drafts/` 目录写 Markdown 文件（`.md`）
+2. **发布阶段**: 将 Markdown 转换为 HTML，放到 `posts/` 目录
+3. **构建索引**: 运行 `python build.py`，只扫描 `posts/*.html`
+4. **提交发布**: Git commit & push
 
-适用于简单的 Markdown 文章，通过 `post.js` 渲染。
+关键点：
+- ✅ `posts/*.html` 是唯一发布源，会被索引
+- ❌ `drafts/*.md` 仅作为参考/模板，不会被索引或发布
+- ✅ 网站内容与 HTML 源文件完全一致
 
-| 文件名         | 语言   |
-| -------------- | ------ |
-| `{slug}.md`    | 原版   |
-| `{slug}.en.md` | 英文版 |
-| `{slug}.zh.md` | 中文版 |
+### HTML 文章结构
 
-#### 方式二：内嵌切换（HTML 文章）
+每个 HTML 文章必须包含以下元数据结构：
+
+```html
+<header class="post-page-header">
+  <h1 class="post-page-title">Your Post Title</h1>
+  <div class="post-page-meta">January 13, 2026</div>
+  <div class="post-page-tags">
+    <span class="post-tag">tag1</span>
+    <span class="post-tag">tag2</span>
+  </div>
+</header>
+
+<div class="post-content">
+  <blockquote>
+    A brief summary of the post (optional)
+  </blockquote>
+
+  <!-- Your content here -->
+</div>
+```
+
+`build.py` 会自动提取：
+- **Title**: `<h1 class="post-page-title">` 的内容
+- **Date**: `<div class="post-page-meta">` 的内容（支持格式：`January 13, 2026` 或 `2026-01-13`）
+- **Tags**: 所有 `<span class="post-tag">` 的内容
+- **Summary**: 第一个 `<blockquote>` 的内容（可选）
+
+### 多语言支持（HTML 内嵌切换）
 
 适用于包含图表、D3 可视化等复杂交互的 HTML 文章。语言切换在单个文件内完成。
 
@@ -285,17 +322,6 @@ if (savedLang) {
 
 **注意**：CSS 选择器必须限制在 `.post-content` 内，否则会隐藏导航栏的语言按钮。
 
-### Front Matter
-
-```yaml
----
-title: How to Read a Paper
-date: 2025-01-05
-tags: [research, methodology]
-summary: A personal guide on reading academic papers.
----
-```
-
 ---
 
 ## 工作流程
@@ -363,6 +389,21 @@ git push publish main
 4. **克制**：每个元素都有其存在的意义
 
 
-## !!! Issue
-存在两个定义tag的方式
-HTML和MD同时会定义build里面的tag,导致我可以在我的HtML里面有一个组tag。然后我最后的build出来的实际展现出来的tag又是来自于MD的。
+## Build Script
+
+`build.py` 现在只扫描 HTML 文件：
+
+```bash
+python build.py
+```
+
+功能：
+1. 扫描 `posts/*.html` 文件
+2. 提取 HTML 中的元数据（title, date, tags, summary）
+3. 生成 `posts.json` 索引供前端使用
+4. 转换 `config.yaml` → `config.json`
+
+**注意**：
+- ✅ 只有 `.html` 文件会被索引
+- ✅ `.md` 文件会被忽略（可用作个人草稿）
+- ✅ 网站内容完全来自 HTML 文件

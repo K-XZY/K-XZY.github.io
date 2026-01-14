@@ -1,35 +1,34 @@
 {
   "posts": [
     {
-      "slug": "exploring-jepa-sigreg-deprecated",
+      "slug": "exploring-jepa-sigreg",
       "date": "2026-01-13",
       "tags": [
+        "self-supervised-learning",
         "representation-learning",
+        "computer-vision"
+      ],
+      "versions": {
+        "original": {
+          "title": "Exploring JEPA and SIGReg",
+          "summary": "Reproducing LeJEPA on CIFAR-100 with ViT-Tiny — SIGReg prevents collapse without\n              contrastive samples, but we discovered an interesting head collapse phenomenon in nano-scale\n              models.",
+          "file": "posts/exploring-jepa-sigreg.html"
+        }
+      }
+    },
+    {
+      "slug": "discrete-visual-tokenizers",
+      "date": "2025-12-14",
+      "tags": [
         "self-supervised-learning",
         "computer-vision",
         "GUI"
       ],
       "versions": {
         "original": {
-          "title": "Exploring JEPA and SIGReg",
-          "summary": "Reproducing LeJEPA on CIFAR-100 with ViT-nano — understanding SIGReg regularization and attention patterns.",
-          "file": "posts/exploring-jepa-sigreg-deprecated.md"
-        }
-      }
-    },
-    {
-      "slug": "discrete-visual-tokenizers-deprecated",
-      "date": "2025-12-14",
-      "tags": [
-        "representation-learning",
-        "self-supervised-learning",
-        "computer-vision"
-      ],
-      "versions": {
-        "original": {
           "title": "Discrete Visual Tokenizers",
-          "summary": "Exploring discrete visual tokenizers for GUI world modeling — from VQ-VAE limitations to Infinity Tokenizer, and the trade-offs we encountered.",
-          "file": "posts/discrete-visual-tokenizers-deprecated.md"
+          "summary": "A review on state of the art (2026) vision tokenizers, and experiment on them.",
+          "file": "posts/discrete-visual-tokenizers.html"
         }
       }
     },
@@ -43,7 +42,7 @@
         "original": {
           "title": "How to Read a Paper",
           "summary": "A personal guide on reading academic papers effectively, focusing on insights and active thinking.",
-          "file": "posts/how-to-read-a-paper.md"
+          "file": "posts/how-to-read-a-paper.html"
         }
       }
     }
@@ -58,5 +57,5 @@
     "representation-learning",
     "self-supervised-learning"
   ],
-  "generated_at": "2026-01-14T01:17:06.454977"
+  "generated_at": "2026-01-14T16:34:51.552052"
 }
