@@ -1,0 +1,12 @@
+# robots.txt for k-xzy.github.io
+
+User-agent: *
+Allow: /
+
+# Disallow drafts and development files
+Disallow: /drafts/
+Disallow: /design-proposals.html
+Disallow: /test-chart.html
+
+# Sitemap
+Sitemap: https://k-xzy.github.io/sitemap.xml
