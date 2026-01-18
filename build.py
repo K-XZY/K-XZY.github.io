@@ -262,11 +262,21 @@ def inject_static_content(index_path: Path, config: dict, posts_index: dict):
 
     posts_html = '\n'.join(posts_html_parts) if posts_html_parts else '<p>No posts yet.</p>'
 
+    # More specific regex: match from posts-list opening to its closing tag,
+    # ensuring we stop at the first </div> that closes posts-list (not nested ones)
+    # Pattern explanation:
+    # - Find: <div class="posts-list" id="posts-list">
+    # - Capture everything until: </div>\n      </section>
+    # This ensures we match the entire posts-list block including the closing </div>
+    pattern = r'(<div class="posts-list" id="posts-list">).*?(</div>\s*</section>)'
+    replacement = rf'\1\n{posts_html}\n      \2'
+
     html_content = re.sub(
-        r'<div class="posts-list" id="posts-list">.*?</div>',
-        f'<div class="posts-list" id="posts-list">\n{posts_html}\n      </div>',
+        pattern,
+        replacement,
         html_content,
-        flags=re.DOTALL
+        flags=re.DOTALL,
+        count=1  # Only replace the first match
     )
 
     # Write back

@@ -24,7 +24,25 @@
   <meta name="twitter:title" content="Discrete Visual Tokenizers">
   <meta name="twitter:description" content="A review of state-of-the-art discrete visual tokenizers for autoregressive image generation, including VQ-VAE, BSQ, and Infinity tokenizer experiments.">
   <link rel="stylesheet" href="../css/style.css?v=9">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <style>
+    /* Math display */
+    .math-display {
+      display: block;
+      text-align: center;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+
+    .katex {
+      font-size: 1.1em;
+    }
+
+    .katex-display {
+      margin: 1rem 0;
+    }
+
     /* Reference button */
     .ref {
       display: inline-block;
@@ -158,8 +176,33 @@
 
           <h2>2. The Reconstruction Problem</h2>
 
-          <p>However, traditional visual tokenizers before Infinity Token have problems reconstructing details such as
-            texts and other patterns
+          <p>Early visual tokenizers were based on VQ-VAE
+            <span class="ref">[van den Oord, 2017]<span class="tooltip">van den Oord et al. "Neural Discrete Representation Learning" (NeurIPS 2017)</span></span>,
+            which used raw MSE reconstruction loss. However, MSE loss tends to neglect fine-grained details,
+            often producing blurry reconstructions.
+          </p>
+
+          <p>To address this limitation, VQ-GAN
+            <span class="ref">[Esser, 2021]<span class="tooltip">Esser et al. "Taming Transformers for High-Resolution Image Synthesis" (CVPR 2021)</span></span>
+            introduced a discriminator network that adapts with the decoder through adversarial training.
+            This GAN-based approach significantly improved reconstruction quality. Over time, VQ-GAN became
+            the dominant method for training visual tokenizers.
+          </p>
+
+          <figure style="margin: 20px auto; max-width: 500px;">
+            <img src="images/VQ-GAN vs VQ-VAE2.png" alt="VQ-VAE vs VQ-GAN comparison"
+              style="width: 100%; border-radius: 3px; display: block;">
+            <figcaption style="margin-top: 10px; font-size: 0.9em; color: #888; line-height: 1.5; text-align: center;">
+              Qualitative comparison of class-conditional image synthesis on ImageNet. Left two columns: VQ-GAN results.
+              Right two columns: VQ-VAE-2 results. Depicted classes: goldfinch (top) and bald eagle (bottom).
+              VQ-GAN produces sharper, more realistic images by leveraging adversarial training, while VQ-VAE-2 with
+              MSE loss tends to generate blurrier outputs. Figure from
+              <span class="ref">[Esser, 2021]<span class="tooltip">Esser et al. "Taming Transformers for High-Resolution Image Synthesis" (CVPR 2021)</span></span>.
+            </figcaption>
+          </figure>
+
+          <p>Despite this improvement, even VQ-GAN-based tokenizers struggle to reconstruct fine details such as
+            texts and complex patterns
             <span class="ref">[Lin, 2025]<span class="tooltip">Lin et al. "VTBench: Evaluating Visual Tokenizers for
                 Autoregressive Image Generation" (2025)</span></span>.
           </p>
@@ -176,13 +219,48 @@
             </figcaption>
           </figure>
 
-          <p>This turns out to be a problem with <strong>representation capacity</strong>. The simple math can show that
-            VQ-VAE has far less token vocab comparing to language models (typical VQ codebook: 1K-16K vs LLM vocab:
-            30K-100K+).</p>
+          <p>This turns out to be a fundamental problem with <strong>representation capacity</strong>.
+            Visual tokenizers compress images into discrete tokens, similar to how language models tokenize text.
+            However, the vocabulary sizes differ dramatically:
+          </p>
+
+          <ul>
+            <li><strong>Visual tokenizers</strong>: 1K-16K codes (VQ-VAE, VQ-GAN)</li>
+            <li><strong>Language models</strong>: 30K-100K+ tokens (GPT, LLaMA)</li>
+          </ul>
+
+          <p>This limited codebook means visual tokenizers must represent the entire visual world—textures,
+            colors, edges, patterns, and yes, text characters—using far fewer discrete symbols than language
+            models use for just one language. The math is simple: with only ~8K codes (2<sup>13</sup>),
+            a typical VQ-GAN must encode every possible 16×16 patch, leading to lossy approximations
+            that fail to capture fine details like text.
+          </p>
 
           <hr>
 
           <h2>3. Scaling Codebook Capacity</h2>
+
+          <h3>VQ-VAE Basics</h3>
+
+          <p><strong>Quantization</strong> is the process of mapping a continuous vector z from a continuous space to a
+            discrete space—essentially converting real-valued representations into discrete tokens.
+          </p>
+
+          <p>To understand the scaling challenge, let's review how traditional VQ-VAE quantization works.
+            VQ-VAE maintains a learnable codebook <strong>E = {e<sub>1</sub>, e<sub>2</sub>, ..., e<sub>K</sub>}</strong>
+            where E ∈ ℝ<sup>K×D</sup>, containing K embedding vectors each of dimension D. For an encoder output z,
+            quantization finds the nearest codebook entry:
+          </p>
+
+          <div class="math-display" data-formula="q(z) = e_k, \quad \text{where} \quad k = \arg\min_{j \in \{1,\ldots,K\}} \|z - e_j\|_2"></div>
+
+          <p>The training loss combines three terms:</p>
+
+          <div class="math-display" data-formula="\mathcal{L} = \underbrace{\|x - D(q(z))\|_2^2}_{\text{reconstruction}} + \underbrace{\|\text{sg}[z] - e_k\|_2^2}_{\text{codebook}} + \underbrace{\beta \|z - \text{sg}[e_k]\|_2^2}_{\text{commitment}}"></div>
+
+          <p>where sg[·] denotes stop-gradient. The codebook loss trains the embeddings, while the commitment loss
+            encourages the encoder to commit to codebook entries.
+          </p>
 
           <h3>The Challenges of Naive Scaling</h3>
 
@@ -193,7 +271,8 @@
               low codebook usage</li>
             <li><strong>Harder prediction</strong>: It makes prediction vastly more challenging as now it has to learn a
               much larger space for classification</li>
-            <li><strong>Lookup cost</strong>: Look up cost also grows with the codebook size — O(K × D), where K is
+            <li><strong>Lookup cost</strong>: The argmin search (k = argmin<sub>j</sub> ||z - e<sub>j</sub>||<sub>2</sub>)
+              requires computing distances to all K codebook entries, resulting in O(K × D) cost per token, where K is
               codebook size and D is vector dimension</li>
           </ol>
 
@@ -204,35 +283,151 @@
 
           <p>Starting in 2024, LFQ, BSQ, and VAR-512 showed new ways to scale tokenizer capacity.</p>
 
-          <p><strong>LFQ</strong>
+          <p><strong>LFQ (Lookup-Free Quantization)</strong>
             <span class="ref">[Yu, 2024]<span class="tooltip">Yu et al. "Language Model Beats Diffusion -- Tokenizer is
                 Key to Visual Generation" (ICLR 2024)</span></span>
-            decomposes the latent space into log₂(K) independent binary dimensions, quantized using only the sign
-            function.
+            eliminates the traditional codebook lookup entirely by decomposing the latent space into log₂(K) independent
+            binary dimensions. Each dimension is quantized using only the sign function:
           </p>
 
-          <p><strong>BSQ</strong>
+          <div class="math-display" data-formula="q(z_i) = \text{sign}(z_i) = \begin{cases} -1 & \text{if } z_i \leq 0 \\ +1 & \text{if } z_i > 0 \end{cases}"></div>
+
+          <p>The token index is then computed as a binary composition:</p>
+
+          <div class="math-display" data-formula="\text{Index}(z) = \sum_{i=1}^{\log_2 K} 2^{i-1} \cdot \mathbb{1}_{\{z_i > 0\}}"></div>
+
+          <p>This approach scales vocabulary size exponentially (2<sup>N</sup>) without the typical degradation seen in
+            naive VQ scaling, and eliminates the O(K×D) lookup cost entirely—quantization becomes O(1) per dimension.
+          </p>
+
+          <p>For the autoregressive predictor, LFQ uses <strong>token factorization</strong> to avoid directly predicting
+            over massive vocabularies. Instead of a single classifier over 2<sup>18</sup> ≈ 262K tokens, LFQ splits this
+            into multiple smaller prediction heads. For example, 18 bits can be factorized into two groups of 9 bits each,
+            requiring only two 512-class classifiers instead of one 262K-class classifier. This dramatically reduces the
+            predictor's parameter count while maintaining the same effective vocabulary size.
+          </p>
+
+          <p><strong>BSQ (Binary Spherical Quantization)</strong>
             <span class="ref">[Zhao, 2025]<span class="tooltip">Zhao et al. "Image and Video Tokenization with Binary
                 Spherical Quantization" (ICLR 2025)</span></span>
-            improves on LFQ by projecting onto a hypersphere before binary quantization, providing bounded error and
-            easier training.
+            improves on LFQ by projecting onto a unit hypersphere before binary quantization. Starting from encoder output z,
+            the key steps are:
+          </p>
+
+          <div class="math-display" data-formula="\mathbf{z} \xrightarrow{\text{Linear}} \mathbf{v} \in \mathbb{R}^L \xrightarrow{\text{normalize}} \mathbf{u} = \frac{\mathbf{v}}{\|\mathbf{v}\|} \xrightarrow{\text{quantize}} q(\mathbf{u}) = \frac{1}{\sqrt{L}} \cdot \text{sign}(\mathbf{u})"></div>
+
+          <p>The spherical normalization ensures all quantized vectors lie on the unit sphere, providing a bounded
+            quantization error:</p>
+
+          <div class="math-display" data-formula="\mathbb{E}[d(\mathbf{u}, q(\mathbf{u}))] < \sqrt{2 - \frac{2}{\sqrt{L}}} < \sqrt{2}"></div>
+
+          <p>The paper shows that this bounded error guarantee and the factorized entropy computation (O(L) instead of
+            O(2<sup>L</sup> × L)) make BSQ more stable and efficient than LFQ during tokenizer training (i.e., training
+            the encoder-decoder to learn the quantization).
           </p>
 
           <p>Both lookup-free methods allow codebook scaling via 2<sup>N</sup>, which is combinatorially larger than
             vanilla VQ.</p>
 
-          <p><strong>VAR-512</strong>
+          <p><strong>VAR (Visual Autoregressive Modeling)</strong>
             <span class="ref">[Tian, 2024]<span class="tooltip">Tian et al. "Visual Autoregressive Modeling: Scalable
                 Image Generation via Next-Scale Prediction" (NeurIPS 2024 Best Paper)</span></span>
-            showed that you can also scale the codebook size by having multiple scales, i.e. residual vector
-            quantization. This means a feature vector can now be a composition of layers of codes.
+            introduces a fundamentally different approach: residual vector quantization with multi-scale prediction.
+            In essence, <strong>traditional VQ-VAE can be viewed as a single-scale version of VAR</strong>—VAR extends
+            this by encoding images across multiple resolution scales.
+            Unlike raster-scan order (left-to-right, top-to-bottom), VAR predicts the next <em>entire scale</em> given
+            all previous scales, following a coarse-to-fine generation:
+          </p>
+
+          <div class="math-display" data-formula="p(r_1, r_2, \ldots, r_K) = \prod_{k=1}^K p(r_k \mid r_1, r_2, \ldots, r_{k-1})"></div>
+
+          <p>where r<sub>k</sub> represents the complete token map at scale k. Each scale captures residual information
+            that couldn't be represented at coarser scales. Importantly, <strong>all scales share a single codebook</strong>
+            Z ∈ ℝ<sup>V×C</sup> (typically V=4096, C=256).
+          </p>
+
+          <p>This architecture provides several advantages:</p>
+
+          <ul>
+            <li><strong>Preserves spatial structure</strong>: No need to flatten 2D feature maps into 1D sequences</li>
+            <li><strong>Computational efficiency</strong>: For an n×n image, VAR's next-scale prediction has O(n⁴)
+              complexity compared to O(n⁶) for traditional raster-scan autoregressive models. However, it's worth
+              noting that in practice, most autoregressive generation methods don't actually generate token-by-token
+              sequentially—they use decoding schedules (e.g., MaskGIT
+              <span class="ref">[Chang, 2022]<span class="tooltip">Chang et al. "MaskGIT: Masked Generative Image Transformer" (CVPR 2022)</span></span>)
+              to generate multiple tokens in parallel, which significantly reduces the wall-clock time gap between
+              different architectural choices</li>
+            <li><strong>Bidirectional tasks</strong>: The multi-scale structure naturally supports inpainting,
+              outpainting, and editing by conditioning on partial observations at any scale</li>
+          </ul>
+
+          <p>The residual quantization means that higher resolution features are encoded as <em>refinements</em> of
+            lower resolution representations, rather than independent tokens. This creates a hierarchical structure
+            where early scales capture global structure and later scales add fine details—including text, which
+            requires high-resolution precision.
           </p>
 
           <p><strong>Infinity Tokenizer</strong>
             <span class="ref">[Han, 2025]<span class="tooltip">Han et al. "Infinity: Scaling Bitwise AutoRegressive
                 Modeling for High-Resolution Image Synthesis" (CVPR 2025 Oral)</span></span>
-            integrates both methods and for the first time, discrete tokenizers showed superior performance than
-            continuous tokenizers (e.g. Stable Diffusion encoder).
+            combines both approaches—multi-scale residual quantization from VAR and binary spherical quantization from BSQ.
+            This integration enables an unprecedented vocabulary size of 2<sup>64</sup> while maintaining computational tractability.
+          </p>
+
+          <p>The key innovation is applying BSQ at each scale of a multi-scale hierarchy. For each scale k, the quantization
+            pipeline processes residual features:</p>
+
+          <div class="math-display" data-formula="\mathbf{F}_k \xrightarrow{\text{compute residual}} \mathbf{F}_k - \mathbf{F}_{k-1} \xrightarrow{\text{downsample}} \mathbf{z}_k \xrightarrow{\text{normalize}} \frac{\mathbf{z}_k}{\|\mathbf{z}_k\|} \xrightarrow{\text{BSQ}} q(\mathbf{z}_k) = \frac{1}{\sqrt{d}} \cdot \text{sign}\left(\frac{\mathbf{z}_k}{\|\mathbf{z}_k\|}\right)"></div>
+
+          <p>where F<sub>k</sub> is the cumulative feature map at scale k. Unlike VAR which uses traditional codebook lookup
+            at each scale, Infinity applies BSQ to produce d binary bits per spatial location. This means each scale's
+            representation is (h<sub>k</sub> × w<sub>k</sub> × d) bits rather than (h<sub>k</sub> × w<sub>k</sub>) discrete indices.
+          </p>
+
+          <p>Like LFQ which uses token factorization to avoid predicting over massive vocabularies directly, Infinity
+            employs bit-wise prediction—the finest-grained factorization possible. With d=32 bits per location and
+            transformer hidden dimension h=2048, a naive softmax classifier over 2<sup>32</sup> indices would require
+            h × 2<sup>32</sup> = 8.8 trillion parameters. Instead, Infinity uses d independent binary classifiers
+            (0.13M parameters total), reducing complexity from O(h × 2<sup>d</sup>) to O(h × d).
+          </p>
+
+          <p>For the first time, this combination allowed discrete tokenizers to outperform continuous tokenizers
+            (e.g., Stable Diffusion encoder) on high-resolution image synthesis benchmarks.
+          </p>
+
+          <h3>Summary: Two Paths to Scaling</h3>
+
+          <p>The evolution of visual tokenizers from 2021 to 2025 followed two complementary approaches to overcome
+            representation capacity limitations:</p>
+
+          <ol>
+            <li><strong>Scaling vocabulary space</strong>: LFQ and BSQ use lookup-free quantization to exponentially
+              scale codebook size (2<sup>N</sup>) without the typical degradation of traditional VQ methods. By eliminating
+              codebook lookup and using binary/spherical quantization, they achieve vocabularies of 2<sup>18</sup> or larger.</li>
+            <li><strong>Scaling through multi-scale</strong>: VAR introduces residual vector quantization across multiple
+              resolution scales, allowing each scale to refine the previous one. This hierarchical approach naturally
+              captures both global structure and fine details.</li>
+          </ol>
+
+          <p><strong>Infinity</strong> represents the convergence of these two paths—combining multi-scale residual
+            quantization with binary spherical quantization to achieve unprecedented capacity (2<sup>64</sup>) while
+            maintaining computational tractability.</p>
+
+          <figure style="margin: 40px 0;">
+            <div id="timeline-container" style="position: relative; background: #f8f8f8; border-radius: 8px; padding: 20px; overflow: visible;">
+              <!-- Layered timeline visualization -->
+            </div>
+            <figcaption style="margin-top: 15px; font-size: 0.9em; color: #888; line-height: 1.5; text-align: center;">
+              Evolution of visual tokenizers showing two convergent paths: scaling codebook vocabulary (top) and multi-scale residual quantization (bottom), both merging into Infinity. Arrow thickness represents time gaps between methods. Hover over nodes and edges for details.
+            </figcaption>
+          </figure>
+
+          <p>However, this progress comes with a trade-off: <strong>increasing algorithmic complexity</strong>.
+            While early methods like VQ-VAE and VQ-GAN were conceptually straightforward—encode, quantize via nearest
+            neighbor, decode—modern approaches require significantly more sophistication. Understanding Infinity's
+            next-scale prediction with bitwise generation demands considerably more effort than traditional autoregressive
+            token-by-token generation. The improved reconstruction quality and capacity come at the cost of implementation
+            complexity and conceptual accessibility.
           </p>
 
           <hr>
@@ -287,6 +482,10 @@
           <h2>References</h2>
 
           <ul>
+            <li>van den Oord et al. — Neural Discrete Representation Learning. NeurIPS, Dec 2017. <a
+                href="https://arxiv.org/abs/1711.00937" target="_blank">[arXiv]</a></li>
+            <li>Esser et al. — Taming Transformers for High-Resolution Image Synthesis. CVPR, Jun 2021. <a
+                href="https://arxiv.org/abs/2012.09841" target="_blank">[arXiv]</a></li>
             <li>Chang et al. — MaskGIT: Masked Generative Image Transformer. CVPR, Jun 2022. <a
                 href="https://arxiv.org/abs/2202.04200" target="_blank">[arXiv]</a></li>
             <li>Gupta et al. — MaskViT: Masked Visual Pre-Training for Video Prediction. ICLR, May 2023. <a
@@ -395,6 +594,323 @@
         tooltip.style.left = rect.left + rect.width / 2 + 'px';
         tooltip.style.top = rect.top - 8 + 'px';
         tooltip.style.transform = 'translate(-50%, -100%)';
+      });
+    });
+
+    // Render KaTeX math formulas
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.math-display').forEach(el => {
+        try {
+          katex.render(el.dataset.formula, el, { displayMode: true, throwOnError: false });
+        } catch (e) { console.error(e); }
+      });
+
+      // Layered timeline visualization showing two convergent paths
+      const nodes = [
+        { id: 'vqvae', name: 'VQ-VAE', year: 2017, month: 11, image: 'images/VQ-VAE2-Bird.png', color: '#8B7355', layer: 1, order: 0 },
+        { id: 'vqgan', name: 'VQ-GAN', year: 2021, month: 6, image: 'images/VQGAN-Bird.png', color: '#A0875B', layer: 0, order: 1 },
+        { id: 'lfq', name: 'LFQ', year: 2023, month: 10, image: 'images/cifar100_fox.png', color: '#6B8E23', layer: 1, order: 2 },
+        { id: 'var', name: 'VAR', year: 2024, month: 4, image: 'images/VAR-Swan.png', color: '#4682B4', layer: 2, order: 2 },
+        { id: 'bsq', name: 'BSQ', year: 2024, month: 6, image: 'images/BSQ-WinterFox.png', color: '#20B2AA', layer: 1, order: 3 },
+        { id: 'infinity', name: 'Infinity', year: 2024, month: 12, image: 'images/Infinity-Panda.jpg', color: '#9370DB', layer: 0, order: 4 }
+      ];
+
+      const edges = [
+        { from: 'vqvae', to: 'vqgan' },
+        { from: 'vqgan', to: 'lfq' },
+        { from: 'lfq', to: 'bsq' },
+        { from: 'bsq', to: 'infinity' },
+        { from: 'vqgan', to: 'var' },
+        { from: 'var', to: 'infinity' }
+      ];
+
+      const container = document.getElementById('timeline-container');
+      if (!container) return;
+
+      // Calculate layout positions
+      const containerWidth = 1000;
+      const containerHeight = 380;  // Reduced height
+      const nodePositions = {};
+
+      // Calculate X positions based on order
+      const maxOrder = Math.max(...nodes.map(n => n.order));
+      const xSpacing = containerWidth / (maxOrder + 1);
+
+      // Y positions for layers - more compact
+      const layerY = {
+        1: 90,   // Top layer (codebook scaling path)
+        0: 190,  // Middle layer (shared nodes)
+        2: 290   // Bottom layer (multi-scale path)
+      };
+
+      nodes.forEach(node => {
+        nodePositions[node.id] = {
+          x: xSpacing * (node.order + 0.5),
+          y: layerY[node.layer]
+        };
+      });
+
+      // Create SVG
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', containerHeight);
+      svg.setAttribute('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
+      svg.style.cssText = 'display: block;';
+
+      // Helper: calculate time gap in months
+      function getTimeGap(fromNode, toNode) {
+        return (toNode.year - fromNode.year) * 12 + (toNode.month - fromNode.month);
+      }
+
+      // Helper: create gradient
+      function createGradient(fromColor, toColor, id) {
+        const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+        gradient.setAttribute('id', `gradient-${id}`);
+        gradient.setAttribute('x1', '0%');
+        gradient.setAttribute('x2', '100%');
+
+        const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop1.setAttribute('offset', '0%');
+        stop1.setAttribute('stop-color', fromColor);
+        stop1.setAttribute('stop-opacity', '0.7');
+
+        const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop2.setAttribute('offset', '100%');
+        stop2.setAttribute('stop-color', toColor);
+        stop2.setAttribute('stop-opacity', '0.7');
+
+        gradient.appendChild(stop1);
+        gradient.appendChild(stop2);
+        return gradient;
+      }
+
+      // Add path labels
+      const pathLabels = [
+        { y: 20, text: 'Scaling Codebook Vocabulary', color: '#6B8E23' },
+        { y: containerHeight - 10, text: 'Multi-scale Residual Quantization', color: '#4682B4' }
+      ];
+
+      pathLabels.forEach(label => {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', containerWidth / 2);
+        text.setAttribute('y', label.y);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', label.color);
+        text.setAttribute('font-size', '13');
+        text.setAttribute('font-weight', '600');
+        text.setAttribute('opacity', '0.7');
+        text.textContent = label.text;
+        svg.appendChild(text);
+      });
+
+      // Draw edges first (so they appear behind nodes)
+      const edgeElements = [];
+      edges.forEach(edge => {
+        const fromNode = nodes.find(n => n.id === edge.from);
+        const toNode = nodes.find(n => n.id === edge.to);
+        const fromPos = nodePositions[edge.from];
+        const toPos = nodePositions[edge.to];
+
+        const timeGap = getTimeGap(fromNode, toNode);
+        const thickness = Math.max(2, Math.min(8, timeGap / 6));
+
+        // Create path
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+        // Check if cross-layer (needs curve)
+        const isCrossLayer = fromNode.layer !== toNode.layer;
+        const nodeRadius = 90; // Half of node width
+
+        if (isCrossLayer) {
+          const controlY = (fromPos.y + toPos.y) / 2;
+          const controlX = (fromPos.x + toPos.x) / 2;
+          path.setAttribute('d',
+            `M ${fromPos.x + nodeRadius} ${fromPos.y}
+             Q ${controlX} ${controlY}, ${toPos.x - nodeRadius} ${toPos.y}`
+          );
+        } else {
+          path.setAttribute('d',
+            `M ${fromPos.x + nodeRadius} ${fromPos.y}
+             L ${toPos.x - nodeRadius} ${toPos.y}`
+          );
+        }
+
+        const gradient = createGradient(fromNode.color, toNode.color, `${edge.from}-${edge.to}`);
+        svg.appendChild(gradient);
+
+        path.setAttribute('stroke', `url(#gradient-${edge.from}-${edge.to})`);
+        path.setAttribute('stroke-width', thickness);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('class', 'timeline-edge');
+        path.setAttribute('data-from', edge.from);
+        path.setAttribute('data-to', edge.to);
+        path.setAttribute('data-time-gap', timeGap);
+        path.style.cssText = 'transition: stroke-width 0.3s, opacity 0.3s; opacity: 0.6; cursor: pointer;';
+
+        svg.appendChild(path);
+        edgeElements.push({ path, edge, fromNode, toNode, timeGap });
+
+        // Add arrowhead
+        const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        const arrowSize = 10;
+        const endX = toPos.x - nodeRadius;
+        const endY = toPos.y;
+
+        // Calculate arrow angle
+        let angle;
+        if (isCrossLayer) {
+          const controlY = (fromPos.y + toPos.y) / 2;
+          const controlX = (fromPos.x + toPos.x) / 2;
+          const dx = endX - controlX;
+          const dy = endY - controlY;
+          angle = Math.atan2(dy, dx);
+        } else {
+          angle = 0; // Horizontal
+        }
+
+        const arrowPoints = [
+          [endX, endY],
+          [endX - arrowSize * Math.cos(angle - Math.PI / 6), endY - arrowSize * Math.sin(angle - Math.PI / 6)],
+          [endX - arrowSize * Math.cos(angle + Math.PI / 6), endY - arrowSize * Math.sin(angle + Math.PI / 6)]
+        ];
+        arrow.setAttribute('points', arrowPoints.map(p => p.join(',')).join(' '));
+        arrow.setAttribute('fill', toNode.color);
+        arrow.setAttribute('opacity', '0.7');
+        arrow.setAttribute('class', 'timeline-arrow');
+        arrow.setAttribute('data-from', edge.from);
+        arrow.setAttribute('data-to', edge.to);
+        svg.appendChild(arrow);
+      });
+
+      // Draw nodes
+      const nodeElements = [];
+      nodes.forEach(node => {
+        const pos = nodePositions[node.id];
+
+        // Create foreignObject for HTML content
+        const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+        fo.setAttribute('x', pos.x - 90);
+        fo.setAttribute('y', pos.y - 90);
+        fo.setAttribute('width', 180);
+        fo.setAttribute('height', 180);
+        fo.setAttribute('class', 'timeline-node');
+        fo.setAttribute('data-id', node.id);
+
+        const div = document.createElement('div');
+        div.style.cssText = `
+          width: 100%;
+          height: 100%;
+          border: 4px solid ${node.color};
+          border-radius: 12px;
+          background: white;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s;
+        `;
+
+        div.innerHTML = `
+          <img src="${node.image}" alt="${node.name}"
+               style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+          <div style="margin-top: 8px; font-weight: 700; font-size: 14px; color: #333;">${node.name}</div>
+          <div style="font-size: 11px; color: ${node.color}; font-weight: 600;">
+            ${node.year}-${String(node.month).padStart(2, '0')}
+          </div>
+        `;
+
+        fo.appendChild(div);
+        svg.appendChild(fo);
+        nodeElements.push({ fo, div, node });
+      });
+
+      container.appendChild(svg);
+
+      // Add tooltip
+      const tooltip = document.createElement('div');
+      tooltip.style.cssText = `
+        position: fixed;
+        background: rgba(0,0,0,0.85);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.2s;
+      `;
+      document.body.appendChild(tooltip);
+
+      function showTooltip(x, y, text) {
+        tooltip.textContent = text;
+        tooltip.style.left = x + 10 + 'px';
+        tooltip.style.top = y + 10 + 'px';
+        tooltip.style.opacity = '1';
+      }
+
+      function hideTooltip() {
+        tooltip.style.opacity = '0';
+      }
+
+      // Add interactions
+      nodeElements.forEach(({ fo, div, node }) => {
+        fo.addEventListener('mouseenter', () => {
+          // Highlight node - only shadow, no size changes at all
+          div.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+
+          // Highlight related edges
+          edgeElements.forEach(({ path, edge }) => {
+            if (edge.from === node.id || edge.to === node.id) {
+              path.style.strokeWidth = '6px';
+              path.style.opacity = '1';
+            } else {
+              path.style.opacity = '0.2';
+            }
+          });
+
+          // Dim other nodes
+          nodeElements.forEach(({ div: otherDiv, node: otherNode }) => {
+            if (otherNode.id !== node.id) {
+              otherDiv.style.opacity = '0.3';
+            }
+          });
+        });
+
+        fo.addEventListener('mouseleave', () => {
+          div.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+
+          edgeElements.forEach(({ path }) => {
+            path.style.strokeWidth = '';
+            path.style.opacity = '0.6';
+          });
+
+          nodeElements.forEach(({ div: otherDiv }) => {
+            otherDiv.style.opacity = '1';
+          });
+        });
+      });
+
+      // Edge hover
+      edgeElements.forEach(({ path, timeGap }) => {
+        path.addEventListener('mouseenter', (e) => {
+          path.style.strokeWidth = '6px';
+          path.style.opacity = '1';
+          showTooltip(e.clientX, e.clientY, `Time gap: ${timeGap} months`);
+        });
+
+        path.addEventListener('mousemove', (e) => {
+          tooltip.style.left = e.clientX + 10 + 'px';
+          tooltip.style.top = e.clientY + 10 + 'px';
+        });
+
+        path.addEventListener('mouseleave', () => {
+          path.style.strokeWidth = '';
+          path.style.opacity = '0.6';
+          hideTooltip();
+        });
       });
     });
   </script>
