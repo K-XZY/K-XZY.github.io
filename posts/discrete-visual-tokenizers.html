@@ -284,8 +284,8 @@
           <p>Starting in 2024, LFQ, BSQ, and VAR-512 showed new ways to scale tokenizer capacity.</p>
 
           <p><strong>LFQ (Lookup-Free Quantization)</strong>
-            <span class="ref">[Yu, 2024]<span class="tooltip">Yu et al. "Language Model Beats Diffusion -- Tokenizer is
-                Key to Visual Generation" (ICLR 2024)</span></span>
+            <span class="ref">[Yu, 2023]<span class="tooltip">Yu et al. "Language Model Beats Diffusion -- Tokenizer is
+                Key to Visual Generation" (arXiv 2023)</span></span>
             eliminates the traditional codebook lookup entirely by decomposing the latent space into log₂(K) independent
             binary dimensions. Each dimension is quantized using only the sign function:
           </p>
@@ -413,12 +413,95 @@
             quantization with binary spherical quantization to achieve unprecedented capacity (2<sup>64</sup>) while
             maintaining computational tractability.</p>
 
-          <figure style="margin: 40px 0;">
-            <div id="timeline-container" style="position: relative; background: #f8f8f8; border-radius: 8px; padding: 20px; overflow: visible;">
-              <!-- Layered timeline visualization -->
+          <figure style="margin: 30px 0;">
+            <div style="background: #1a1c1e; border-radius: 6px; padding: 25px 15px; max-width: 850px; margin: 0 auto;">
+              <svg width="100%" height="300" viewBox="0 0 800 300" style="display: block;">
+                <!-- Three rows layout:
+                     Top row (y=30): LFQ(280), BSQ(560)
+                     Middle row (y=120): VQ-VAE(40), VQ-GAN(160), Infinity(688)
+                     Bottom row (y=210): VAR(420) -->
+
+                <!-- Arrows (drawn first, behind nodes) -->
+                <!-- VQ-VAE → VQ-GAN (middle row) -->
+                <line x1="136" y1="180" x2="160" y2="180" stroke="#B89968" stroke-width="2.5"/>
+                <polygon points="160,180 150,176 150,184" fill="#B89968"/>
+
+                <!-- VQ-GAN → LFQ (middle up to top) -->
+                <path d="M 208,150 Q 244,70 280,60" stroke="#8FA663" stroke-width="2" fill="none"/>
+                <polygon points="280,60 271,58 275,66" fill="#7AAD4F"/>
+
+                <!-- LFQ → BSQ (top row) -->
+                <line x1="376" y1="85" x2="560" y2="85" stroke="#65A09D" stroke-width="2"/>
+                <polygon points="560,85 550,81 550,89" fill="#3DB5AA"/>
+
+                <!-- VQ-GAN → VAR (middle down to bottom) -->
+                <path d="M 208,210 Q 280,240 420,250" stroke="#8896B3" stroke-width="2" fill="none"/>
+                <polygon points="420,250 410,247 413,255" fill="#5B92D4"/>
+
+                <!-- BSQ → Infinity (top to middle right) -->
+                <path d="M 616,110 Q 652,150 688,160" stroke="#8084BE" stroke-width="2" fill="none"/>
+                <polygon points="688,160 678,158 682,166" fill="#A587EB"/>
+
+                <!-- VAR → Infinity (bottom to middle right) -->
+                <path d="M 488,230 Q 580,190 688,180" stroke="#8084BE" stroke-width="2" fill="none"/>
+                <polygon points="688,180 678,178 682,186" fill="#A587EB"/>
+
+                <!-- Nodes (all uniform 96x112 boxes with 80x80 images) -->
+
+                <!-- Top row: LFQ, BSQ -->
+                <foreignObject x="280" y="30" width="96" height="112">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;border:2px solid #7AAD4F;border-radius:5px;background:#252729;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 5px 5px 5px;">
+                    <img src="images/LFQ-Panda.png" style="width:80px;height:80px;object-fit:cover;border-radius:3px;"/>
+                    <div style="margin-top:3px;font-weight:700;font-size:10px;color:#eee;">LFQ</div>
+                    <div style="font-size:8px;color:#7AAD4F;font-weight:600;">2023-10</div>
+                  </div>
+                </foreignObject>
+
+                <foreignObject x="560" y="30" width="96" height="112">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;border:2px solid #3DB5AA;border-radius:5px;background:#252729;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 5px 5px 5px;">
+                    <img src="images/BSQ-WinterFox.png" style="width:80px;height:80px;object-fit:cover;border-radius:3px;"/>
+                    <div style="margin-top:3px;font-weight:700;font-size:10px;color:#eee;">BSQ</div>
+                    <div style="font-size:8px;color:#3DB5AA;font-weight:600;">2024-06</div>
+                  </div>
+                </foreignObject>
+
+                <!-- Middle row: VQ-VAE, VQ-GAN, Infinity -->
+                <foreignObject x="40" y="124" width="96" height="112">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;border:2px solid #A0875B;border-radius:5px;background:#252729;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 5px 5px 5px;">
+                    <img src="images/VQ-VAE2-Bird.png" style="width:80px;height:80px;object-fit:cover;border-radius:3px;"/>
+                    <div style="margin-top:3px;font-weight:700;font-size:10px;color:#eee;">VQ-VAE</div>
+                    <div style="font-size:8px;color:#B89968;font-weight:600;">2017-11</div>
+                  </div>
+                </foreignObject>
+
+                <foreignObject x="160" y="124" width="96" height="112">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;border:2px solid #B89968;border-radius:5px;background:#252729;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 5px 5px 5px;">
+                    <img src="images/VQGAN-Bird.png" style="width:80px;height:80px;object-fit:cover;border-radius:3px;"/>
+                    <div style="margin-top:3px;font-weight:700;font-size:10px;color:#eee;">VQ-GAN</div>
+                    <div style="font-size:8px;color:#B89968;font-weight:600;">2021-06</div>
+                  </div>
+                </foreignObject>
+
+                <foreignObject x="688" y="124" width="96" height="112">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;border:2px solid #A587EB;border-radius:5px;background:#252729;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 5px 5px 5px;">
+                    <img src="images/Infinity-Panda.jpg" style="width:80px;height:80px;object-fit:cover;border-radius:3px;"/>
+                    <div style="margin-top:3px;font-weight:700;font-size:10px;color:#eee;">Infinity</div>
+                    <div style="font-size:8px;color:#A587EB;font-weight:600;">2024-12</div>
+                  </div>
+                </foreignObject>
+
+                <!-- Bottom row: VAR -->
+                <foreignObject x="420" y="194" width="96" height="112">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;border:2px solid #5B92D4;border-radius:5px;background:#252729;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 5px 5px 5px;">
+                    <img src="images/VAR-Swan.png" style="width:80px;height:80px;object-fit:cover;border-radius:3px;"/>
+                    <div style="margin-top:3px;font-weight:700;font-size:10px;color:#eee;">VAR</div>
+                    <div style="font-size:8px;color:#5B92D4;font-weight:600;">2024-04</div>
+                  </div>
+                </foreignObject>
+              </svg>
             </div>
             <figcaption style="margin-top: 15px; font-size: 0.9em; color: #888; line-height: 1.5; text-align: center;">
-              Evolution of visual tokenizers showing two convergent paths: scaling codebook vocabulary (top) and multi-scale residual quantization (bottom), both merging into Infinity. Arrow thickness represents time gaps between methods. Hover over nodes and edges for details.
+              Evolution of visual tokenizers from 2017 to 2024, showing two convergent technical paths: scaling codebook vocabulary (top) and multi-scale residual quantization (bottom). Both paths merge into Infinity tokenizer.
             </figcaption>
           </figure>
 
@@ -453,32 +536,6 @@
 
           <hr>
 
-          <h2>5. Our Experiment</h2>
-
-          <h3>Hypothesis</h3>
-
-          <p>Can language be modeled from pixels alone via masked modeling?</p>
-
-          <h3>Problems Encountered</h3>
-
-          <p>We ran into a few problems:</p>
-
-          <ol>
-            <li><strong>Masking in residual setup</strong>: It is unclear how to mask the visual in a residual setup,
-              especially since we found the visual features leak in the CNN+ViT hybrid of the Infinity encoder</li>
-            <li><strong>Semantic capture</strong>: The tokenizer isn't really good at capturing semantics as mentioned
-              earlier. The model had a far easier time when we used an untrained CNN as encoder</li>
-            <li><strong>Multi-scale learning</strong>: Next scale prediction takes a very long time to learn good enough
-              views for every scale, such that scale-to-scale prediction can yield visually meaningful results.
-              Unfortunately we couldn't train long enough for that to be fully visible</li>
-          </ol>
-
-          <h3>Outcome</h3>
-
-          <p>In the end we had to call off the experiment due to limited resources.</p>
-
-          <hr>
-
           <h2>References</h2>
 
           <ul>
@@ -495,7 +552,7 @@
             <li>Lin et al. — VTBench: Evaluating Visual Tokenizers for Autoregressive Image Generation. arXiv, May 2025.
               <a href="https://arxiv.org/abs/2505.13439" target="_blank">[arXiv]</a>
             </li>
-            <li>Yu et al. — Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation. ICLR, May 2024. <a
+            <li>Yu et al. — Language Model Beats Diffusion -- Tokenizer is Key to Visual Generation. arXiv, Oct 2023. <a
                 href="https://arxiv.org/abs/2310.05737" target="_blank">[arXiv]</a></li>
             <li>Zhao et al. — Image and Video Tokenization with Binary Spherical Quantization. ICLR, May 2025. <a
                 href="https://arxiv.org/abs/2406.07548" target="_blank">[arXiv]</a></li>
@@ -603,314 +660,6 @@
         try {
           katex.render(el.dataset.formula, el, { displayMode: true, throwOnError: false });
         } catch (e) { console.error(e); }
-      });
-
-      // Layered timeline visualization showing two convergent paths
-      const nodes = [
-        { id: 'vqvae', name: 'VQ-VAE', year: 2017, month: 11, image: 'images/VQ-VAE2-Bird.png', color: '#8B7355', layer: 1, order: 0 },
-        { id: 'vqgan', name: 'VQ-GAN', year: 2021, month: 6, image: 'images/VQGAN-Bird.png', color: '#A0875B', layer: 0, order: 1 },
-        { id: 'lfq', name: 'LFQ', year: 2023, month: 10, image: 'images/cifar100_fox.png', color: '#6B8E23', layer: 1, order: 2 },
-        { id: 'var', name: 'VAR', year: 2024, month: 4, image: 'images/VAR-Swan.png', color: '#4682B4', layer: 2, order: 2 },
-        { id: 'bsq', name: 'BSQ', year: 2024, month: 6, image: 'images/BSQ-WinterFox.png', color: '#20B2AA', layer: 1, order: 3 },
-        { id: 'infinity', name: 'Infinity', year: 2024, month: 12, image: 'images/Infinity-Panda.jpg', color: '#9370DB', layer: 0, order: 4 }
-      ];
-
-      const edges = [
-        { from: 'vqvae', to: 'vqgan' },
-        { from: 'vqgan', to: 'lfq' },
-        { from: 'lfq', to: 'bsq' },
-        { from: 'bsq', to: 'infinity' },
-        { from: 'vqgan', to: 'var' },
-        { from: 'var', to: 'infinity' }
-      ];
-
-      const container = document.getElementById('timeline-container');
-      if (!container) return;
-
-      // Calculate layout positions
-      const containerWidth = 1000;
-      const containerHeight = 380;  // Reduced height
-      const nodePositions = {};
-
-      // Calculate X positions based on order
-      const maxOrder = Math.max(...nodes.map(n => n.order));
-      const xSpacing = containerWidth / (maxOrder + 1);
-
-      // Y positions for layers - more compact
-      const layerY = {
-        1: 90,   // Top layer (codebook scaling path)
-        0: 190,  // Middle layer (shared nodes)
-        2: 290   // Bottom layer (multi-scale path)
-      };
-
-      nodes.forEach(node => {
-        nodePositions[node.id] = {
-          x: xSpacing * (node.order + 0.5),
-          y: layerY[node.layer]
-        };
-      });
-
-      // Create SVG
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('width', '100%');
-      svg.setAttribute('height', containerHeight);
-      svg.setAttribute('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
-      svg.style.cssText = 'display: block;';
-
-      // Helper: calculate time gap in months
-      function getTimeGap(fromNode, toNode) {
-        return (toNode.year - fromNode.year) * 12 + (toNode.month - fromNode.month);
-      }
-
-      // Helper: create gradient
-      function createGradient(fromColor, toColor, id) {
-        const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-        gradient.setAttribute('id', `gradient-${id}`);
-        gradient.setAttribute('x1', '0%');
-        gradient.setAttribute('x2', '100%');
-
-        const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        stop1.setAttribute('offset', '0%');
-        stop1.setAttribute('stop-color', fromColor);
-        stop1.setAttribute('stop-opacity', '0.7');
-
-        const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        stop2.setAttribute('offset', '100%');
-        stop2.setAttribute('stop-color', toColor);
-        stop2.setAttribute('stop-opacity', '0.7');
-
-        gradient.appendChild(stop1);
-        gradient.appendChild(stop2);
-        return gradient;
-      }
-
-      // Add path labels
-      const pathLabels = [
-        { y: 20, text: 'Scaling Codebook Vocabulary', color: '#6B8E23' },
-        { y: containerHeight - 10, text: 'Multi-scale Residual Quantization', color: '#4682B4' }
-      ];
-
-      pathLabels.forEach(label => {
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', containerWidth / 2);
-        text.setAttribute('y', label.y);
-        text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('fill', label.color);
-        text.setAttribute('font-size', '13');
-        text.setAttribute('font-weight', '600');
-        text.setAttribute('opacity', '0.7');
-        text.textContent = label.text;
-        svg.appendChild(text);
-      });
-
-      // Draw edges first (so they appear behind nodes)
-      const edgeElements = [];
-      edges.forEach(edge => {
-        const fromNode = nodes.find(n => n.id === edge.from);
-        const toNode = nodes.find(n => n.id === edge.to);
-        const fromPos = nodePositions[edge.from];
-        const toPos = nodePositions[edge.to];
-
-        const timeGap = getTimeGap(fromNode, toNode);
-        const thickness = Math.max(2, Math.min(8, timeGap / 6));
-
-        // Create path
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-
-        // Check if cross-layer (needs curve)
-        const isCrossLayer = fromNode.layer !== toNode.layer;
-        const nodeRadius = 90; // Half of node width
-
-        if (isCrossLayer) {
-          const controlY = (fromPos.y + toPos.y) / 2;
-          const controlX = (fromPos.x + toPos.x) / 2;
-          path.setAttribute('d',
-            `M ${fromPos.x + nodeRadius} ${fromPos.y}
-             Q ${controlX} ${controlY}, ${toPos.x - nodeRadius} ${toPos.y}`
-          );
-        } else {
-          path.setAttribute('d',
-            `M ${fromPos.x + nodeRadius} ${fromPos.y}
-             L ${toPos.x - nodeRadius} ${toPos.y}`
-          );
-        }
-
-        const gradient = createGradient(fromNode.color, toNode.color, `${edge.from}-${edge.to}`);
-        svg.appendChild(gradient);
-
-        path.setAttribute('stroke', `url(#gradient-${edge.from}-${edge.to})`);
-        path.setAttribute('stroke-width', thickness);
-        path.setAttribute('fill', 'none');
-        path.setAttribute('class', 'timeline-edge');
-        path.setAttribute('data-from', edge.from);
-        path.setAttribute('data-to', edge.to);
-        path.setAttribute('data-time-gap', timeGap);
-        path.style.cssText = 'transition: stroke-width 0.3s, opacity 0.3s; opacity: 0.6; cursor: pointer;';
-
-        svg.appendChild(path);
-        edgeElements.push({ path, edge, fromNode, toNode, timeGap });
-
-        // Add arrowhead
-        const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        const arrowSize = 10;
-        const endX = toPos.x - nodeRadius;
-        const endY = toPos.y;
-
-        // Calculate arrow angle
-        let angle;
-        if (isCrossLayer) {
-          const controlY = (fromPos.y + toPos.y) / 2;
-          const controlX = (fromPos.x + toPos.x) / 2;
-          const dx = endX - controlX;
-          const dy = endY - controlY;
-          angle = Math.atan2(dy, dx);
-        } else {
-          angle = 0; // Horizontal
-        }
-
-        const arrowPoints = [
-          [endX, endY],
-          [endX - arrowSize * Math.cos(angle - Math.PI / 6), endY - arrowSize * Math.sin(angle - Math.PI / 6)],
-          [endX - arrowSize * Math.cos(angle + Math.PI / 6), endY - arrowSize * Math.sin(angle + Math.PI / 6)]
-        ];
-        arrow.setAttribute('points', arrowPoints.map(p => p.join(',')).join(' '));
-        arrow.setAttribute('fill', toNode.color);
-        arrow.setAttribute('opacity', '0.7');
-        arrow.setAttribute('class', 'timeline-arrow');
-        arrow.setAttribute('data-from', edge.from);
-        arrow.setAttribute('data-to', edge.to);
-        svg.appendChild(arrow);
-      });
-
-      // Draw nodes
-      const nodeElements = [];
-      nodes.forEach(node => {
-        const pos = nodePositions[node.id];
-
-        // Create foreignObject for HTML content
-        const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-        fo.setAttribute('x', pos.x - 90);
-        fo.setAttribute('y', pos.y - 90);
-        fo.setAttribute('width', 180);
-        fo.setAttribute('height', 180);
-        fo.setAttribute('class', 'timeline-node');
-        fo.setAttribute('data-id', node.id);
-
-        const div = document.createElement('div');
-        div.style.cssText = `
-          width: 100%;
-          height: 100%;
-          border: 4px solid ${node.color};
-          border-radius: 12px;
-          background: white;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s;
-        `;
-
-        div.innerHTML = `
-          <img src="${node.image}" alt="${node.name}"
-               style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
-          <div style="margin-top: 8px; font-weight: 700; font-size: 14px; color: #333;">${node.name}</div>
-          <div style="font-size: 11px; color: ${node.color}; font-weight: 600;">
-            ${node.year}-${String(node.month).padStart(2, '0')}
-          </div>
-        `;
-
-        fo.appendChild(div);
-        svg.appendChild(fo);
-        nodeElements.push({ fo, div, node });
-      });
-
-      container.appendChild(svg);
-
-      // Add tooltip
-      const tooltip = document.createElement('div');
-      tooltip.style.cssText = `
-        position: fixed;
-        background: rgba(0,0,0,0.85);
-        color: white;
-        padding: 8px 12px;
-        border-radius: 4px;
-        font-size: 12px;
-        pointer-events: none;
-        z-index: 1000;
-        opacity: 0;
-        transition: opacity 0.2s;
-      `;
-      document.body.appendChild(tooltip);
-
-      function showTooltip(x, y, text) {
-        tooltip.textContent = text;
-        tooltip.style.left = x + 10 + 'px';
-        tooltip.style.top = y + 10 + 'px';
-        tooltip.style.opacity = '1';
-      }
-
-      function hideTooltip() {
-        tooltip.style.opacity = '0';
-      }
-
-      // Add interactions
-      nodeElements.forEach(({ fo, div, node }) => {
-        fo.addEventListener('mouseenter', () => {
-          // Highlight node - only shadow, no size changes at all
-          div.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
-
-          // Highlight related edges
-          edgeElements.forEach(({ path, edge }) => {
-            if (edge.from === node.id || edge.to === node.id) {
-              path.style.strokeWidth = '6px';
-              path.style.opacity = '1';
-            } else {
-              path.style.opacity = '0.2';
-            }
-          });
-
-          // Dim other nodes
-          nodeElements.forEach(({ div: otherDiv, node: otherNode }) => {
-            if (otherNode.id !== node.id) {
-              otherDiv.style.opacity = '0.3';
-            }
-          });
-        });
-
-        fo.addEventListener('mouseleave', () => {
-          div.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
-
-          edgeElements.forEach(({ path }) => {
-            path.style.strokeWidth = '';
-            path.style.opacity = '0.6';
-          });
-
-          nodeElements.forEach(({ div: otherDiv }) => {
-            otherDiv.style.opacity = '1';
-          });
-        });
-      });
-
-      // Edge hover
-      edgeElements.forEach(({ path, timeGap }) => {
-        path.addEventListener('mouseenter', (e) => {
-          path.style.strokeWidth = '6px';
-          path.style.opacity = '1';
-          showTooltip(e.clientX, e.clientY, `Time gap: ${timeGap} months`);
-        });
-
-        path.addEventListener('mousemove', (e) => {
-          tooltip.style.left = e.clientX + 10 + 'px';
-          tooltip.style.top = e.clientY + 10 + 'px';
-        });
-
-        path.addEventListener('mouseleave', () => {
-          path.style.strokeWidth = '';
-          path.style.opacity = '0.6';
-          hideTooltip();
-        });
       });
     });
   </script>
