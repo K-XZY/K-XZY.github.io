@@ -30,13 +30,16 @@ website/
 
 ### Git
 
-`website/` is a submodule of the parent research-notes repo.
+`website/` is a submodule of the parent research-notes repo, with two remotes:
 
 ```
-origin:  K-XZY/kevinxie-website.git     # development
+origin:   https://github.com/K-XZY/kevinxie-website.git     # development
+publish:  git@github.com:K-XZY/K-XZY.github.io.git          # GitHub Pages (SSH)
 ```
 
-Deployed via GitHub Pages from `main` branch → https://k-xzy.github.io
+GitHub Pages deploys from `publish` repo's `main` branch → https://k-xzy.github.io
+
+Always push to both remotes when deploying.
 
 ---
 
@@ -218,10 +221,9 @@ Edit `index.html`, add inside `.posts-list`:
 cd website
 git add -A
 git commit -m "description"
-git push origin main
+git push origin main       # development
+git push publish main      # GitHub Pages (k-xzy.github.io)
 ```
-
-GitHub Pages auto-deploys from `main`.
 
 ---
 
