@@ -23,7 +23,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Discrete Visual Tokenizers">
   <meta name="twitter:description" content="A review of state-of-the-art discrete visual tokenizers for autoregressive image generation, including VQ-VAE, BSQ, and Infinity tokenizer experiments.">
-  <link rel="stylesheet" href="../css/style.css?v=9">
+  <link rel="stylesheet" href="../css/style.css?v=10">
   <style>
     /* Reference button */
     .ref {
@@ -78,38 +78,8 @@
 
 <body>
   <div class="layout">
-    <!-- Navigator -->
-    <nav class="navigator" id="navigator">
-      <div class="nav-section">
-        <div class="nav-links">
-          <a href="../index.html" class="nav-link">
-            <span class="nav-icon">⌂</span>
-            <span>Home</span>
-          </a>
-          <a href="../index.html#posts" class="nav-link active">
-            <span class="nav-icon">✎</span>
-            <span>Posts</span>
-          </a>
-        </div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-lang" id="lang-switcher">
-          <button class="lang-btn active" data-lang="original">X</button>
-        </div>
-      </div>
-      <div class="nav-section">
-        <div class="nav-history">
-          <button class="history-btn" id="prev-post" title="Previous post">&larr;</button>
-          <button class="history-btn" id="next-post" title="Next post">&rarr;</button>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Mobile Menu Toggle -->
-    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
-      <span class="menu-icon"></span>
-    </button>
-    <div class="nav-overlay" id="nav-overlay"></div>
+    <!-- Nav injected by components.js -->
+    <div id="nav-root"></div>
 
     <!-- Main Content -->
     <main class="main">
@@ -309,96 +279,13 @@
         </div>
       </article>
 
-      <footer class="footer">
-        &copy; 2025
-      </footer>
+      <!-- Footer injected by components.js -->
+      <div id="footer-root"></div>
     </main>
   </div>
 
-  <script>
-    // Mobile menu
-    const toggle = document.getElementById('menu-toggle');
-    const navigator = document.getElementById('navigator');
-    const overlay = document.getElementById('nav-overlay');
-
-    toggle?.addEventListener('click', () => {
-      toggle.classList.toggle('active');
-      navigator.classList.toggle('active');
-      overlay.classList.toggle('active');
-      document.body.style.overflow = navigator.classList.contains('active') ? 'hidden' : '';
-    });
-
-    overlay?.addEventListener('click', () => {
-      toggle.classList.remove('active');
-      navigator.classList.remove('active');
-      overlay.classList.remove('active');
-      document.body.style.overflow = '';
-    });
-
-    // Language switching
-    const langSwitcher = document.getElementById('lang-switcher');
-
-    // Inject tooltips into language buttons
-    if (langSwitcher) {
-      const langLabels = {
-        'original': 'Original',
-        'en': 'English',
-        'zh': '中文',
-        'ja': '日本語',
-        'ko': '한국語',
-        'mixed': 'Mixed'
-      };
-
-      langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
-        const lang = btn.dataset.lang;
-        if (lang && langLabels[lang] && !btn.querySelector('.lang-tooltip')) {
-          const tooltip = document.createElement('span');
-          tooltip.className = 'lang-tooltip';
-          tooltip.textContent = langLabels[lang];
-          btn.appendChild(tooltip);
-        }
-      });
-    }
-    langSwitcher?.addEventListener('click', (e) => {
-      if (e.target.classList.contains('lang-btn')) {
-        const lang = e.target.dataset.lang;
-        document.body.className = 'lang-' + lang;
-
-        // Update button states
-        langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.lang === lang);
-        });
-
-        // Save preference
-        localStorage.setItem('post-lang', lang);
-      }
-    });
-
-    // Restore saved language
-    const savedLang = localStorage.getItem('post-lang');
-    if (savedLang) {
-      document.body.className = 'lang-' + savedLang;
-      langSwitcher?.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === savedLang);
-      });
-    }
-
-    // Reference tooltips
-    document.querySelectorAll('.ref').forEach(ref => {
-      const tooltip = ref.querySelector('.tooltip');
-      if (!tooltip) return;
-
-      ref.addEventListener('mouseenter', () => {
-        const rect = ref.getBoundingClientRect();
-
-        // Position above the reference
-        tooltip.style.left = rect.left + rect.width / 2 + 'px';
-        tooltip.style.top = rect.top - 8 + 'px';
-        tooltip.style.transform = 'translate(-50%, -100%)';
-      });
-    });
-  </script>
-  <script src="../js/navigation.js?v=1"></script>
+  <script src="../js/components.js?v=1"></script>
+  <script src="../js/navigation.js?v=2"></script>
 </body>
 
 </html>

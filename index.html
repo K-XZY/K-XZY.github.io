@@ -4,122 +4,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google-site-verification" content="2qSXE1oFi9MtNpJ4GgMVj9cV7Z1qZ8dFFsh6m63yKLs" />
-  <meta name="description" content="Kevin Xie's research blog on AI, robotics, self-supervised learning, and computer vision. MEng student at UCL exploring machine learning and intelligent systems.">
-  <title>Kevin Xie | AI & Robotics Research Blog</title>
-  <link rel="stylesheet" href="css/style.css?v=9">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <meta name="description" content="Kevin Xie — researching self-improving learning algorithms at UCL. Working at the intersection of Vision Language Action Models, Unsupervised RL, and Representation Learning.">
+  <title>Kevin Xie | AI Research</title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://k-xzy.github.io/">
+  <meta property="og:title" content="Kevin Xie | AI Research">
+  <meta property="og:description" content="Researching self-improving learning algorithms at UCL. Vision Language Action Models, Unsupervised RL, and Representation Learning.">
+
+  <link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
   <div class="layout">
-    <!-- Navigator (3D Tilted Sidebar) -->
-    <nav class="navigator" id="navigator">
-      <div class="nav-section">
-        <div class="nav-links">
-          <a href="#about" class="nav-link active" data-section="about">
-            <span class="nav-icon">⌂</span>
-            <span>Home</span>
-          </a>
-          <a href="#posts" class="nav-link" data-section="posts">
-            <span class="nav-icon">✎</span>
-            <span>Posts</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-lang" id="lang-switcher">
-          <button class="lang-btn active" data-lang="original">X</button>
-          <button class="lang-btn" data-lang="en">EN</button>
-          <button class="lang-btn" data-lang="zh">中</button>
-          <button class="lang-btn" data-lang="ja">日</button>
-        </div>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-history">
-          <button class="history-btn" id="prev-post" title="Previous post">←</button>
-          <button class="history-btn" id="next-post" title="Next post">→</button>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Mobile Menu Toggle -->
-    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
-      <span class="menu-icon"></span>
-    </button>
-
-    <!-- Overlay for mobile -->
-    <div class="nav-overlay" id="nav-overlay"></div>
+    <!-- Nav injected by components.js -->
+    <div id="nav-root"></div>
 
     <!-- Main Content -->
     <main class="main">
       <!-- About Section -->
       <section class="about" id="about">
-        <div class="avatar" id="avatar">K</div>
+        <div class="avatar" id="avatar" data-photo="photos/Kevin Xie.jpeg">K</div>
         <div class="about-inner">
           <div class="about-content">
             <div class="label">About</div>
-            <h1 class="name" id="profile-name">Kevin (Ziyang) Xie</h1>
-            <p class="tagline" id="profile-tagline">MEng Student @ UCL | AI & Robotics</p>
-            <p class="bio" id="profile-bio">I'm a student studying Robotics &amp; AI at UCL. My research interest is self-supervised learning<br>and continual learning — figuring out how to make models understand the world<br>without massive labeled datasets, and keep learning new things without extra training.<br></p>
-            <div class="links" id="social-links"><a href="https://github.com/K-XZY" target="_blank">GitHub</a> · <a href="https://www.linkedin.com/in/kevin-xie-xzy" target="_blank">LinkedIn</a> · <a href="#" class="email-link" data-email="kevin.xie.23@ucl.ac.uk">Email</a></div>
+            <h1 class="name" id="profile-name">Kevin (子阳) Xie</h1>
+            <p class="bio" id="profile-bio">I am currently working on learning algorithms that can self-improve without any human involvement. My work covers the intersection of Vision Language Action Models, Unsupervised Reinforcement Learning, and Representation Learning.</p>
+            <p class="bio">My research work is currently supervised by <a href="https://christopherlu.github.io" target="_blank">Chris Lu</a> and his <a href="https://christopherlu.github.io/group_website/team/" target="_blank">group</a> at University College London.</p>
+            <p class="bio">I am currently enrolled in the MEng Robotics and AI program at UCL. During this time, I worked as an analyst intern at <a href="https://www.linear.vc" target="_blank">Linear Capital</a>. I then worked on GUI Agents and Latent World Models for a few months as our program's industry project.</p>
+            <div class="links" id="social-links">
+              <a href="https://github.com/K-XZY" target="_blank">GitHub</a> ·
+              <a href="https://www.linkedin.com/in/kevin-xie-xzy" target="_blank">LinkedIn</a> ·
+              <a href="#" class="email-link" data-email="kevin.xie.23@ucl.ac.uk">Email</a>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Search & Filter -->
-      <section class="search-section">
-        <input type="text" class="search-input" id="search-input" placeholder="Search posts...">
-        <div class="tags" id="tags-container"></div>
+      <!-- Projects Section -->
+      <section class="posts-section" id="projects">
+        <div class="posts-header">Research Projects</div>
+        <div class="posts-list">
+          <div class="post">
+            <div class="post-title">VLM &amp; VLA Self-Supervised Improvement</div>
+            <div class="post-meta status-ongoing">on-going</div>
+            <p class="post-summary">VLM and VLA with improvement without labels through cooperative learning where natural language communication is essential for success.</p>
+            <div class="post-tags">
+              <span class="post-tag">self-supervised-learning</span>
+              <span class="post-tag">reinforcement-learning</span>
+              <span class="post-tag">VLM</span>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <!-- Posts Section -->
-      <section class="posts-section" id="posts">
-        <div class="posts-header">Posts</div>
-        <div class="posts-list" id="posts-list">
-        <article class="post-item">
-          <a href="posts/exploring-jepa-sigreg.html" class="post-link">
-            <h3 class="post-title">Exploring JEPA and SIGReg</h3>
-            <p class="post-summary">Reproducing LeJEPA on CIFAR-100 with ViT-Tiny — SIGReg prevents collapse without
-              contrastive samples, but we discovered an interesting head collapse phenomenon in nano-scale
-              models.</p>
-            <div class="post-meta">
-              <span class="post-date">Jan 13, 2026</span>
-              <div class="post-tags"><span class="post-tag">self-supervised-learning</span><span class="post-tag">representation-learning</span><span class="post-tag">computer-vision</span></div>
-            </div>
-          </a>
-        </article>
-        <article class="post-item">
-          <a href="posts/discrete-visual-tokenizers.html" class="post-link">
-            <h3 class="post-title">Discrete Visual Tokenizers</h3>
-            <p class="post-summary">A review on state of the art (2026) vision tokenizers, and experiment on them.</p>
-            <div class="post-meta">
-              <span class="post-date">Dec 14, 2025</span>
-              <div class="post-tags"><span class="post-tag">self-supervised-learning</span><span class="post-tag">computer-vision</span><span class="post-tag">GUI</span></div>
-            </div>
-          </a>
-        </article>
-        <article class="post-item">
-          <a href="posts/how-to-read-a-paper.html" class="post-link">
-            <h3 class="post-title">How to Read a Paper</h3>
-            <p class="post-summary">A personal guide on reading academic papers effectively, focusing on insights and active thinking.</p>
-            <div class="post-meta">
-              <span class="post-date">Jan 05, 2025</span>
-              <div class="post-tags"><span class="post-tag">methodology</span></div>
-            </div>
-          </a>
-        </article>
-      </div>
+      <!-- Blog link -->
+      <section class="blog-link-section">
+        <p class="blog-link-text">For some of my old blogs from 2025, see <a href="blog.html">here</a>.</p>
       </section>
 
-      <!-- Footer -->
-      <footer class="footer">
-        &copy; 2026
-      </footer>
+      <!-- Footer injected by components.js -->
+      <div id="footer-root"></div>
     </main>
   </div>
 
-  <script src="js/navigation.js?v=1"></script>
-  <script src="js/main.js?v=10"></script>
+  <script src="js/components.js?v=1"></script>
+  <script src="js/navigation.js?v=2"></script>
+  <script src="js/main.js?v=11"></script>
 </body>
 </html>
