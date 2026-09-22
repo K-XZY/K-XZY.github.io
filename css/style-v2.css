@@ -1,0 +1,2491 @@
+/* =============================================================
+   style-v2.css — light, rounded, top-bar
+   Drop-in replacement for style.css. Content markup unchanged.
+
+   Four themes, selected with a data-theme attribute on <html>:
+     paper  — warm editorial off-white, serif display     (default)
+     grid   — cool engineering notebook, graph-paper field
+     soft   — pillowy, borderless, very round
+     slate  — crisp academic, denser, tighter radii
+
+   Legacy v1 token names (--void, --surface, --text-primary,
+   --jade-bright, …) are aliased at the bottom of :root so the
+   inline <style> blocks in posts/*.html and js/diagrams.js keep
+   resolving without edits.
+   ============================================================= */
+
+/* ==================== Theme: paper (default) ==================== */
+:root,
+[data-theme="paper"] {
+  /* Link arrows, drawn centred in a 16x16 box so their centroids coincide. */
+  --arrow-out: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.6 12.4 12.4 3.6'/%3E%3Cpath d='M6.2 3.6h6.2v6.2'/%3E%3C/g%3E%3C/svg%3E");
+  --arrow-in:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8h10'/%3E%3Cpath d='M9 4l4 4-4 4'/%3E%3C/g%3E%3C/svg%3E");
+
+  --bg:            #f7f4ed;
+  --bg-2:          #f1ece2;
+  --card:          #fffdf8;
+  --card-2:        #f6f1e7;
+  --chip:          #efe9dc;
+
+  --line:          #e2d9c8;
+  --line-strong:   #cdbfa5;
+
+  --ink:           #26231d;
+  --ink-2:         #4d4740;
+  --ink-3:         #7a7268;
+  --ink-4:         #a89e90;
+
+  --accent:        #8a6d2f;   /* names, titles */
+  --link:          #1f6b40;   /* jade, restrained */
+  --link-hover:    #14512f;
+  --status:        #2f8a55;
+
+  --font-display:  "Palatino", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-sans:     "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono:     "Menlo", "SF Mono", "Fira Code", monospace;
+
+  --r-lg:          16px;
+  --r:             12px;
+  --r-sm:          8px;
+  --r-pill:        999px;
+  --r-avatar:      16px;
+
+  --card-border:   1px solid var(--line);
+  --shadow:        0 1px 2px rgba(60, 48, 28, 0.04), 0 8px 24px -12px rgba(60, 48, 28, 0.16);
+  --shadow-raised: 0 2px 4px rgba(60, 48, 28, 0.06), 0 16px 36px -16px rgba(60, 48, 28, 0.24);
+
+  --bar-bg:        rgba(247, 244, 237, 0.82);
+  --bar-line:      var(--line);
+  --hover:         rgba(138, 109, 47, 0.07);
+  --active-bg:     rgba(138, 109, 47, 0.11);
+
+  --measure:       820px;
+  --bar-h:         60px;
+  --pad-card:      36px;
+
+  /* Avatar breaks out of the about card — overhangs left and top.
+     Shared by every theme unless a theme overrides them below. */
+  --avatar-size:   152px;
+  --avatar-out:    46px;   /* how far it juts past the card's left edge */
+  --avatar-up:     30px;   /* how far it rises above the card's top edge */
+}
+
+/* ==================== Theme: grid ==================== */
+[data-theme="grid"] {
+  --bg:            #f2f4f7;
+  --bg-2:          #e9edf2;
+  --card:          #ffffff;
+  --card-2:        #f4f6f9;
+  --chip:          #eaeef4;
+
+  --line:          #d7dee7;
+  --line-strong:   #b3bfcd;
+
+  --ink:           #161b22;
+  --ink-2:         #3d4754;
+  --ink-3:         #6b7686;
+  --ink-4:         #97a1af;
+
+  --accent:        #2b3a52;
+  --link:          #0e7a45;
+  --link-hover:    #0a5c34;
+  --status:        #0e7a45;
+
+  --font-display:  "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans:     "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono:     "Menlo", "SF Mono", "Fira Code", monospace;
+
+  --r-lg:          12px;
+  --r:             10px;
+  --r-sm:          6px;
+  --r-pill:        6px;      /* squares, not pills */
+  --r-avatar:      12px;
+
+  --card-border:   1px solid var(--line);
+  --shadow:        0 1px 0 rgba(22, 27, 34, 0.03);
+  --shadow-raised: 0 2px 0 rgba(22, 27, 34, 0.04), 0 12px 28px -18px rgba(22, 27, 34, 0.35);
+
+  --bar-bg:        rgba(242, 244, 247, 0.85);
+  --bar-line:      var(--line);
+  --hover:         rgba(43, 58, 82, 0.06);
+  --active-bg:     rgba(43, 58, 82, 0.10);
+
+  --measure:       860px;
+  --bar-h:         58px;
+  --pad-card:      32px;
+
+  --grid-line:     rgba(43, 58, 82, 0.055);
+}
+
+/* ==================== Theme: soft ==================== */
+[data-theme="soft"] {
+  --bg:            #f1f0ee;
+  --bg-2:          #e9e8e5;
+  --card:          #ffffff;
+  --card-2:        #f7f6f4;
+  --chip:          #f0efec;
+
+  --line:          transparent;
+  --line-strong:   rgba(60, 60, 60, 0.10);
+
+  --ink:           #2f3033;
+  --ink-2:         #55575c;
+  --ink-3:         #83868c;
+  --ink-4:         #a9acb2;
+
+  --accent:        #2f3033;
+  --link:          #2f9e6b;
+  --link-hover:    #218054;
+  --status:        #2f9e6b;
+
+  --font-display:  "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans:     "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono:     "Menlo", "SF Mono", "Fira Code", monospace;
+
+  --r-lg:          26px;
+  --r:             20px;
+  --r-sm:          12px;
+  --r-pill:        999px;
+  --r-avatar:      24px;
+
+  --card-border:   1px solid transparent;
+  --shadow:        0 2px 6px rgba(40, 40, 45, 0.05), 0 18px 40px -20px rgba(40, 40, 45, 0.22);
+  --shadow-raised: 0 4px 10px rgba(40, 40, 45, 0.07), 0 28px 56px -22px rgba(40, 40, 45, 0.30);
+
+  --bar-bg:        rgba(241, 240, 238, 0.80);
+  --bar-line:      transparent;
+  --hover:         rgba(47, 48, 51, 0.05);
+  --active-bg:     rgba(47, 48, 51, 0.09);
+
+  --measure:       780px;
+  --bar-h:         64px;
+  --pad-card:      40px;
+}
+
+/* ==================== Theme: slate ==================== */
+[data-theme="slate"] {
+  --bg:            #eceef1;
+  --bg-2:          #e3e6ea;
+  --card:          #ffffff;
+  --card-2:        #f3f5f7;
+  --chip:          #e7ebef;
+
+  --line:          #dbe0e6;
+  --line-strong:   #b8c1cc;
+
+  --ink:           #1b1f24;
+  --ink-2:         #414a54;
+  --ink-3:         #6d7784;
+  --ink-4:         #98a2ae;
+
+  --accent:        #0f5f5a;
+  --link:          #0f766e;
+  --link-hover:    #0b5751;
+  --status:        #0f766e;
+
+  --font-display:  "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans:     "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono:     "Menlo", "SF Mono", "Fira Code", monospace;
+
+  --r-lg:          10px;
+  --r:             8px;
+  --r-sm:          6px;
+  --r-pill:        6px;
+  --r-avatar:      10px;
+
+  --card-border:   1px solid var(--line);
+  --shadow:        0 1px 2px rgba(27, 31, 36, 0.05);
+  --shadow-raised: 0 3px 8px rgba(27, 31, 36, 0.09), 0 14px 30px -18px rgba(27, 31, 36, 0.30);
+
+  --bar-bg:        rgba(236, 238, 241, 0.86);
+  --bar-line:      var(--line);
+  --hover:         rgba(15, 95, 90, 0.07);
+  --active-bg:     rgba(15, 95, 90, 0.11);
+
+  --measure:       880px;
+  --bar-h:         54px;
+  --pad-card:      28px;
+}
+
+/* ==================== Theme: warm ====================
+   Slate with the temperature turned up. Identical geometry — same radii,
+   density, measure, bar height — but the neutrals go warm greige and the
+   card off-white. The teal accent is kept (deepened slightly to hold its
+   ground against a warm field), so the page reads warm with a cool
+   highlight rather than warm throughout. */
+[data-theme="warm"] {
+  --bg:            #efece5;
+  --bg-2:          #e7e3da;
+  --card:          #fffdf9;
+  --card-2:        #f7f3ec;
+  --chip:          #ebe6dc;
+
+  --line:          #e1dace;
+  --line-strong:   #bfb5a3;
+
+  --ink:           #211e19;
+  --ink-2:         #47423a;
+  --ink-3:         #776f63;
+  --ink-4:         #a49b8c;
+
+  --accent:        #14635c;
+  --link:          #0f766e;
+  --link-hover:    #0a544e;
+  --status:        #0f766e;
+
+  --font-display:  "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans:     "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono:     "Menlo", "SF Mono", "Fira Code", monospace;
+
+  --r-lg:          10px;
+  --r:             8px;
+  --r-sm:          6px;
+  --r-pill:        6px;
+  --r-avatar:      10px;
+
+  --card-border:   1px solid var(--line);
+  --shadow:        0 1px 2px rgba(52, 44, 30, 0.06);
+  --shadow-raised: 0 3px 8px rgba(52, 44, 30, 0.10), 0 14px 30px -18px rgba(52, 44, 30, 0.32);
+
+  --bar-bg:        rgba(239, 236, 229, 0.86);
+  --bar-line:      var(--line);
+  --hover:         rgba(20, 99, 92, 0.07);
+  --active-bg:     rgba(20, 99, 92, 0.11);
+
+  --measure:       880px;
+  --bar-h:         54px;
+  --pad-card:      28px;
+}
+
+/* ==================== Theme: clay ====================
+   The same frame taken all the way warm — clay-tinted surfaces, a
+   terracotta accent for names and titles, and a deep forest green for
+   links (an echo of the jade the dark site used). No cool notes left. */
+[data-theme="clay"] {
+  --bg:            #f1eae1;
+  --bg-2:          #e9e1d5;
+  --card:          #fffdf8;
+  --card-2:        #f8f3ea;
+  --chip:          #ece4d7;
+
+  --line:          #e2d9c9;
+  --line-strong:   #c4b69d;
+
+  --ink:           #241f18;
+  --ink-2:         #4b4338;
+  --ink-3:         #7b7161;
+  --ink-4:         #a89d89;
+
+  --accent:        #8a5230;
+  --link:          #2f6b46;
+  --link-hover:    #23543a;
+  --status:        #2f6b46;
+
+  --font-display:  "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans:     "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono:     "Menlo", "SF Mono", "Fira Code", monospace;
+
+  --r-lg:          10px;
+  --r:             8px;
+  --r-sm:          6px;
+  --r-pill:        6px;
+  --r-avatar:      10px;
+
+  --card-border:   1px solid var(--line);
+  --shadow:        0 1px 2px rgba(70, 52, 32, 0.06);
+  --shadow-raised: 0 3px 8px rgba(70, 52, 32, 0.11), 0 14px 30px -18px rgba(70, 52, 32, 0.34);
+
+  --bar-bg:        rgba(241, 234, 225, 0.86);
+  --bar-line:      var(--line);
+  --hover:         rgba(138, 82, 48, 0.08);
+  --active-bg:     rgba(138, 82, 48, 0.12);
+
+  --measure:       880px;
+  --bar-h:         54px;
+  --pad-card:      28px;
+}
+
+/* ==================== Theme: neu ====================
+   Neumorphism, applied to the big blocks only. The card is the same colour
+   as the page, so nothing is drawn by a fill or a border: the block is shaped
+   by two shadows, dark down-right and light up-left, as if lit from the top
+   left. Every block on the page shares that one light source, or the illusion
+   reads as a mistake.
+
+   The known cost is contrast: a card the colour of its background has ~1:1
+   contrast against it, so the block's edge is not visible to a reader who
+   cannot resolve the soft shadow. Text and the link pills are therefore left
+   at the slate theme's contrast and are NOT flattened into the field — they
+   stay the elements that carry the affordance. */
+[data-theme="neu"] {
+  --bg:            #e4e8ee;
+  --bg-2:          #dde2e9;
+  --card:          #e4e8ee;   /* identical to --bg; the whole premise */
+  --card-2:        #dfe4eb;
+  --chip:          #dde2e9;
+
+  --line:          #d4dae2;
+  --line-strong:   #b3bcc8;
+
+  --ink:           #1b1f24;
+  --ink-2:         #414a54;
+  --ink-3:         #616b78;
+  --ink-4:         #8b95a2;
+
+  --accent:        #0f5f5a;
+  --link:          #0f766e;
+  --link-hover:    #0b5751;
+  --status:        #0f766e;
+
+  --font-display:  "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans:     "Avenir Next", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono:     "Menlo", "SF Mono", "Fira Code", monospace;
+
+  /* Rounder than slate: the extrusion needs a radius to catch the light on. */
+  --r-lg:          24px;
+  --r:             20px;
+  --r-sm:          12px;
+  --r-pill:        999px;
+  --r-avatar:      20px;
+
+  /* No border — the two shadows are the edge. */
+  --card-border:   none;
+  --shadow:        8px 8px 16px #c5ccd7, -8px -8px 16px #fbfdff;
+  --shadow-raised: 12px 12px 24px #bfc7d3, -12px -12px 24px #ffffff;
+
+  --bar-bg:        rgba(228, 232, 238, 0.88);
+  --bar-line:      transparent;
+  --hover:         rgba(15, 95, 90, 0.07);
+  --active-bg:     rgba(15, 95, 90, 0.11);
+
+  --measure:       880px;
+  --bar-h:         54px;
+  --pad-card:      32px;
+}
+
+/* ==================== Legacy v1 token aliases ====================
+   Keeps posts/*.html inline styles and js/diagrams.js working. */
+:root {
+  --void:             var(--bg);
+  --surface:          var(--card);
+  --elevated:         var(--card-2);
+
+  --text-primary:     var(--ink);
+  --text-secondary:   var(--ink-2);
+  --text-tertiary:    var(--ink-3);
+  --text-quaternary:  var(--ink-4);
+
+  --line-hover:       var(--line-strong);
+
+  --jade:             var(--chip);
+  --jade-light:       var(--line-strong);
+  --jade-bright:      var(--link);
+
+  --font-serif:       "Palatino", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --radius:           var(--r);
+}
+
+/* ==================== Reset & base ==================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* The page scrolls inside .layout, not in the document.
+
+   macOS rubber-bands whatever is scrolling, and anything inside it rides the
+   bounce — a fixed bar with the document, a sticky bar with the scroller.
+   So the bar is not in the scroller at all: the body is a column of two, the
+   bar and the scrolling area, and only the second one bounces. The elastic
+   feel is kept for the page and the bar cannot move, because nothing it sits
+   in is scrolling. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* components.js replaces #nav-root with the bar itself (outerHTML), so the
+   flex item here is .navigator, not the placeholder. Without flex-shrink: 0
+   the column squeezes the bar below its --bar-h to fit the viewport, which
+   left its keys touching the top and bottom edges. */
+#nav-root,
+body > .navigator {
+  flex: 0 0 auto;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--ink-2);
+  line-height: 1.65;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--active-bg);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ==================== Layout ==================== */
+.layout {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* A jump to #publications used to land under the bar, which now takes real
+   space at the top of the scroller. Anything a link can target stops below
+   it instead. */
+:target,
+.posts-section,
+.about,
+.post-content h2,
+.post-content h3 {
+  scroll-margin-top: calc(var(--bar-h) + 16px);
+}
+
+/* Side padding is wide enough that the avatar's overhang lands in the
+   gutter, so the about card stays flush with the sections below it. */
+.main {
+  margin: 0 auto;
+  /* The bar is in the flow now, so only the gap below it is reserved. */
+  padding: 64px 56px 96px;
+  max-width: calc(var(--measure) + 112px);
+  width: 100%;
+}
+
+/* ==================== Top bar ====================
+   Injected by js/components.js as
+   .navigator > .nav-brand + .nav-section*
+   A conventional fixed bar: brand left, links and controls right.
+   The floating 3D sidebar and its cursor parallax are gone from the
+   JS entirely, so nothing here has to fight an inline transform. */
+.navigator {
+  /* Neither fixed nor sticky: the bar is a sibling of the scroller, so it
+     holds its place without either. */
+  position: relative;
+  width: 100%;
+  height: var(--bar-h);
+
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 24px;
+
+  background: var(--bar-bg);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+  border: none;
+  border-bottom: 1px solid var(--bar-line);
+  border-radius: 0;
+
+  transform: none;
+  box-shadow: none;
+  z-index: 1000;
+}
+
+/* Optional brand element — rendered when components.js provides it.
+   Absent today, in which case the links simply sit flush left. */
+.nav-brand {
+  margin-right: auto;
+  padding: 6px 10px 6px 0;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-brand:hover {
+  color: var(--ink);
+}
+
+.nav-section {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.nav-section + .nav-section {
+  margin-top: 0;
+  margin-left: 12px;
+  padding-top: 0;
+  padding-left: 12px;
+  border-top: none;
+  border-left: 1px solid var(--line);
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: row;
+  /* 2px read as one continuous strip; separate keys need air between them. */
+  gap: 8px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  margin: 0;
+
+  color: var(--ink-3);
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 500;
+  border-radius: var(--r-sm);
+
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-link:hover {
+  color: var(--ink);
+  background: var(--hover);
+}
+
+.nav-link.active {
+  color: var(--ink);
+  background: var(--active-bg);
+}
+
+.nav-icon {
+  width: auto;
+  font-size: 14px;
+  opacity: 0.55;
+}
+
+.nav-link:hover .nav-icon,
+.nav-link.active .nav-icon {
+  opacity: 0.85;
+}
+
+/* Language switcher, in-bar */
+.nav-lang {
+  display: flex;
+  gap: 2px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+}
+
+.lang-btn {
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  color: var(--ink-4);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: background 0.15s, color 0.15s;
+  min-width: 28px;
+  position: relative;
+}
+
+.lang-btn:hover {
+  color: var(--ink-2);
+  background: var(--hover);
+}
+
+.lang-btn.active {
+  color: var(--ink);
+  background: var(--active-bg);
+}
+
+.lang-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: -34px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--card);
+  white-space: nowrap;
+  box-shadow: var(--shadow-raised);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.lang-btn:hover .lang-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* History arrows */
+.nav-history {
+  display: flex;
+  gap: 6px;
+}
+
+.history-btn {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-4);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.history-btn:hover {
+  color: var(--ink-2);
+  background: var(--hover);
+  border-color: var(--line-strong);
+}
+
+/* ==================== About ==================== */
+.about {
+  position: relative;
+  display: block;
+
+  background: var(--card);
+  border: var(--card-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+
+  padding: var(--pad-card);
+  /* Clear the portion of the avatar that sits over the card */
+  padding-left: calc(var(--avatar-size) - var(--avatar-out) + 30px);
+  margin: 0 0 56px;
+  overflow: visible;
+}
+
+/* v1's glowing jade underlines are retired in the light themes */
+.about::after,
+.avatar::after {
+  content: none;
+}
+
+/* Thinking outside the box — the photo overhangs the card's top-left
+   corner and is lifted off it with the raised shadow. */
+.avatar {
+  position: absolute;
+  left: calc(-1 * var(--avatar-out));
+  top: calc(-1 * var(--avatar-up));
+
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-avatar);
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--ink-4);
+  font-family: var(--font-display);
+  font-size: calc(var(--avatar-size) * 0.3);
+  font-weight: 400;
+  /* Deliberately not var(--shadow-raised): `grid` and `slate` keep their
+     card shadows nearly flat, and the photo needs to lift off the card in
+     every theme. Neutral alpha reads correctly on all four backgrounds. */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07), 0 14px 32px -12px rgba(0, 0, 0, 0.30);
+  z-index: 2;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  display: block;
+}
+
+.about-inner {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  gap: 0;
+}
+
+.about-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Eyebrow label — sits above a heading, never acts as one.
+   Used for "About", where the name below is the real heading. */
+.label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 10px;
+}
+
+.label::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  background: var(--link);
+  border-radius: 2px;
+  opacity: 0.75;
+}
+
+/* Section heading — "Research Projects", "Blog".
+   A real heading, not an eyebrow: display type at reading size, an accent
+   square anchoring the left, and a rule running out to the right margin so
+   the section reads as a distinct band on the page. */
+.posts-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--ink);
+  margin: 0 0 22px;
+}
+
+/* Publications and Research Projects are sibling sections. The gap is wider
+   than the 56px under the about card, so a section break reads as a bigger
+   division than the gap between a section and the intro above it. */
+.posts-section + .posts-section {
+  margin-top: 72px;
+}
+
+.posts-header::before {
+  content: '';
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  background: var(--accent);
+  border-radius: 2px;
+  opacity: 1;
+}
+
+/* Rule fills whatever space the heading text leaves */
+.posts-header::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 1px;
+  min-width: 24px;
+  background: var(--line);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.tagline {
+  font-size: 15px;
+  color: var(--ink-3);
+  margin-bottom: 20px;
+}
+
+.bio {
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: var(--ink-2);
+  margin-bottom: 16px;
+  font-family: var(--font-sans);
+}
+
+.bio:last-of-type {
+  margin-bottom: 22px;
+}
+
+.bio a {
+  color: var(--link);
+  text-decoration: none;
+  opacity: 1;
+  border-bottom: 1px solid color-mix(in srgb, var(--link) 35%, transparent);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.bio a:hover {
+  color: var(--link-hover);
+  border-bottom-color: var(--link-hover);
+}
+
+.links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Solid, raised buttons. They straddle the card's left edge — part over
+   the white card, part over the page background — so an opaque fill plus
+   a real shadow is what makes them read as one object rather than two
+   halves. The shadow is hardcoded neutral alpha for the same reason the
+   avatar's is: `grid` and `slate` keep --shadow nearly flat. */
+.links a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--card);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 10px -4px rgba(0, 0, 0, 0.18);
+  transition: color 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+}
+
+.links a:hover {
+  color: var(--ink);
+  border-color: var(--link);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 9px 20px -6px rgba(0, 0, 0, 0.26);
+}
+
+/* Press: settle back down onto the page */
+.links a:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
+}
+
+.links .email-link {
+  cursor: pointer;
+  position: relative;
+}
+
+/* Whenever there is a left column to use, the social buttons stack
+   vertically beneath the photo and share its width, instead of sitting at
+   the end of the bio. Below 700px they fall back to a row (see the
+   max-width block further down) because the column is gone. */
+@media (min-width: 701px) {
+  .about {
+    /* The buttons are out of flow, so the card would not grow to fit them.
+       Reserve photo height + gap + four ~39px buttons + bottom padding, so
+       a shorter bio can never let them spill past the card's edge. Bump the
+       180px if another social link is added. */
+    min-height: calc(
+      var(--avatar-size) - var(--avatar-up) + 18px + 180px + var(--pad-card)
+    );
+  }
+
+  .links {
+    position: absolute;
+    left: calc(-1 * var(--avatar-out));
+    top: calc(var(--avatar-size) - var(--avatar-up) + 18px);
+    width: var(--avatar-size);
+
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .links a {
+    text-align: center;
+  }
+}
+
+/* ==================== Search (kept for compatibility) ==================== */
+.search-section {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 13px 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  color: var(--ink);
+  font-size: 15px;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-input::placeholder {
+  color: var(--ink-4);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--link);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--link) 14%, transparent);
+}
+
+.tag-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: var(--shadow-raised);
+}
+
+.tag-suggestion {
+  padding: 10px 16px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-size: 14px;
+}
+
+.tag-suggestion:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.tag-suggestion.selected {
+  background: var(--active-bg);
+  color: var(--ink);
+}
+
+.tag-suggestion:first-child {
+  border-radius: var(--r) var(--r) 0 0;
+}
+
+.tag-suggestion:last-child {
+  border-radius: 0 0 var(--r) var(--r);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.tag {
+  padding: 6px 12px;
+  background: var(--chip);
+  border: none;
+  color: var(--ink-3);
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: var(--r-pill);
+  transition: background 0.15s, color 0.15s;
+}
+
+.tag:hover {
+  color: var(--ink);
+}
+
+.tag.active {
+  color: var(--card);
+  background: var(--link);
+}
+
+/* ==================== Post / project cards ==================== */
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.post {
+  display: block;
+  text-decoration: none;
+
+  background: var(--card);
+  border: var(--card-border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+
+  padding: 22px 24px;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+/* v1 drew hairlines between rows; cards replace them */
+.post:first-child {
+  border-top: var(--card-border);
+}
+
+.post:hover {
+  background: var(--card);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-raised);
+  border-color: var(--line-strong);
+  padding: 22px 24px;
+  margin: 0;
+}
+
+.post-title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+  transition: color 0.15s;
+}
+
+.post:hover .post-title {
+  color: var(--accent);
+}
+
+/* A status pill set in the title runs on from the last word rather than
+   taking a line of its own, so it reads as part of the heading. Its own
+   bottom margin belongs to the block form and is dropped here. */
+.post-title .post-meta {
+  vertical-align: middle;
+  margin-bottom: 0;
+  margin-left: 4px;
+  /* The title's tighter tracking is the heading's, not the pill's. */
+  letter-spacing: 0.02em;
+  /* Keeps the pill whole when the title wraps: it moves to the next line
+     rather than breaking across two. */
+  white-space: nowrap;
+}
+
+/* Author line. The site owner's own name is marked so a reader can find it
+   in a list at a glance — the usual convention on an academic page. */
+.post-authors {
+  font-size: 13.5px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin-bottom: 2px;
+}
+
+.author-self {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* A linked co-author is tinted rather than underlined, so at rest the only
+   underlined name in the list is still the site owner's — the two marks
+   never mean the same thing. */
+.post-authors a {
+  color: var(--link);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.post-authors a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.post-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--ink-4);
+  margin-bottom: 10px;
+}
+
+.post-meta.status-ongoing {
+  color: var(--status);
+  opacity: 1;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--status) 12%, transparent);
+}
+
+.post-meta.status-ongoing::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--status);
+}
+
+.post-summary {
+  font-size: 15px;
+  color: var(--ink-2);
+  line-height: 1.65;
+  font-family: var(--font-sans);
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.post-tag {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+  background: var(--chip);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+}
+
+/* The thumbnail floats rather than sitting in a flex column, so the text
+   simply flows around it: the title and tags wrap beside it, and the
+   description reclaims the full card width the moment it clears the box's
+   bottom edge. No fixed column means no dead space on either side.
+   It must stay first in source order — a float only affects content that
+   follows it. */
+.post-thumb {
+  float: right;
+  width: 180px;
+  height: 180px;
+  margin: 0 0 14px 20px;
+
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--card-2);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contain the float so a short card cannot let it spill past the border */
+.post::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+/* Only when the tags sit above it — blog cards put the summary first */
+.post-tags + .post-summary {
+  margin-top: 14px;
+}
+
+/* Placeholder state. :empty only matches with no children AND no text, so
+   the div must be written with nothing between its tags — not even a
+   newline — or it will silently render as a blank grey square. */
+.post-thumb:empty {
+  border: 1px dashed var(--line-strong);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 7px,
+    color-mix(in srgb, var(--line-strong) 20%, transparent) 7px,
+    color-mix(in srgb, var(--line-strong) 20%, transparent) 8px
+  );
+}
+
+.post-thumb:empty::after {
+  content: 'image';
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  background: var(--card-2);
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+
+.post-thumb img,
+.post-thumb video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Card foot: resource links on the left, sponsors on the right. Wraps to two
+   lines on a narrow card, and `margin-left: auto` on the sponsors keeps them
+   right-aligned even once they are alone on their own line — which
+   justify-content: space-between would not do. */
+/* A rule separates the card's action zone from its content, so the links
+   below are read as a different kind of thing from the tags above. */
+.post-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.post-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Deliberately the same raised-button treatment as the social buttons in the
+   About card: on this site, solid + bordered + shadowed means "this does
+   something", while tags stay flat, borderless and muted. Matching a tag's
+   pill shape is what made these read as metadata. */
+.post-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--link);
+  text-decoration: none;
+  text-transform: lowercase;
+  padding: 7px 13px;
+
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--card);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 10px -4px rgba(0, 0, 0, 0.18);
+  transition: color 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+}
+
+/* Arrow keyed off where the link actually goes: diagonal leaves the site,
+   horizontal stays on it.
+
+   Drawn, not typed. As characters the two arrows came from whatever font had
+   them, so they differed in weight and in size, and sat on the text baseline
+   rather than on the label's optical centre. Each is now a mask over a
+   currentColor box of a fixed 11px square, so both are the same scale, both
+   centre on the same point, and both still take the link's ink and invert
+   with it on hover. Each glyph is drawn centred in its own 16x16 viewBox, so
+   the two centroids land in the same place. */
+.post-links a::after {
+  content: "";
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  background-color: currentColor;
+  opacity: 0.5;
+
+  -webkit-mask: var(--arrow-out) center / contain no-repeat;
+          mask: var(--arrow-out) center / contain no-repeat;
+}
+
+.post-links a:not([target="_blank"])::after {
+  -webkit-mask-image: var(--arrow-in);
+          mask-image: var(--arrow-in);
+}
+
+/* A video opens in an overlay on this page, so neither arrow is true of it.
+   The play glyph that said so has moved to the front of the pill as a real
+   icon, so nothing trails the label. The target stays _blank only as the
+   fallback for a reader without JavaScript, who does leave the page. */
+.post-links a.video-link::after {
+  content: none;
+}
+
+.post-links a:hover {
+  color: var(--card);
+  background: var(--link);
+  border-color: var(--link);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 9px 20px -6px rgba(0, 0, 0, 0.26);
+}
+
+.post-links a:hover::after {
+  opacity: 0.9;
+}
+
+.post-links a:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
+}
+
+/* A link that does not exist yet (no arXiv id, no project page). A <span>, not
+   an <a>, so it is not focusable and announces nothing clickable; it keeps the
+   pill's size so the row does not reflow once the real link replaces it. */
+.post-links .link-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+  /* No lowercasing here, unlike the real pills: these carry source names
+     (arXiv) that own their capitalisation. */
+  padding: 7px 13px;
+
+  /* Same shape and size as a real link pill, greyed throughout: a tinted fill
+     instead of the card white, and no shadow. On this site a raised, shadowed
+     box means "this does something", so a flat, tinted one reads as inert
+     without needing to be clicked to find out. */
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--chip);
+  box-shadow: none;
+  cursor: default;
+}
+
+.post-links .link-pending::after {
+  content: "(coming soon)";
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+}
+
+.post-sponsors {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.sponsors-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+
+/* Both marks ship at 96px tall, so a shared height aligns them exactly.
+   Left at full opacity — these are third-party brand marks, not decoration. */
+.post-sponsors img {
+  display: block;
+  height: 18px;
+  width: auto;
+}
+
+/* ==================== Blog link / disclaimer ==================== */
+.blog-link-section {
+  margin-top: 48px;
+}
+
+.blog-link-text {
+  font-size: 15px;
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+}
+
+.blog-link-text a,
+.blog-disclaimer a {
+  color: var(--link);
+  text-decoration: none;
+  opacity: 1;
+  border-bottom: 1px solid color-mix(in srgb, var(--link) 35%, transparent);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.blog-link-text a:hover,
+.blog-disclaimer a:hover {
+  color: var(--link-hover);
+  border-bottom-color: var(--link-hover);
+}
+
+.blog-disclaimer {
+  font-size: 14.5px;
+  color: var(--ink-3);
+  font-style: normal;
+  margin-bottom: 28px;
+  line-height: 1.65;
+  font-family: var(--font-sans);
+
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  padding: 14px 18px;
+}
+
+/* ==================== Footer ==================== */
+.footer {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--ink-4);
+}
+
+/* ==================== Empty state ==================== */
+.empty-state {
+  text-align: center;
+  padding: 48px;
+  color: var(--ink-3);
+}
+
+/* ==================== Post page ==================== */
+.post-page {
+  position: relative;
+  background: var(--card);
+  border: var(--card-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  padding: 48px;
+}
+
+.post-page::before {
+  content: none;
+}
+
+.post-page-header {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 28px;
+  margin-bottom: 32px;
+}
+
+.post-page-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.post-page-meta {
+  font-size: 13px;
+  color: var(--ink-4);
+  font-family: var(--font-mono);
+  margin-bottom: 14px;
+}
+
+.post-page-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.post-lang-switcher {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.lang-link {
+  color: var(--ink-3);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.lang-link:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+  background: var(--hover);
+}
+
+.lang-link.active {
+  border-color: var(--link);
+  color: var(--link);
+  background: color-mix(in srgb, var(--link) 8%, transparent);
+}
+
+/* ==================== Post content ==================== */
+.post-content {
+  color: var(--ink-2);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.post-content h1 {
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin: 48px 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.post-content h2 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 36px 0 14px;
+}
+
+.post-content h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 28px 0 10px;
+}
+
+.post-content p {
+  margin-bottom: 18px;
+}
+
+.post-content a {
+  color: var(--link);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--link) 35%, transparent);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.post-content a:hover {
+  color: var(--link-hover);
+  border-bottom-color: var(--link-hover);
+}
+
+.post-content ul,
+.post-content ol {
+  margin: 16px 0;
+  padding-left: 22px;
+}
+
+.post-content li {
+  margin-bottom: 8px;
+}
+
+.post-content li::marker {
+  color: var(--ink-4);
+}
+
+.post-content blockquote {
+  position: relative;
+  border-left: 3px solid var(--line-strong);
+  background: var(--card-2);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  padding: 14px 20px;
+  margin: 24px 0;
+  color: var(--ink-3);
+  font-style: normal;
+}
+
+.post-content code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background-color: var(--chip);
+  padding: 2px 6px;
+  border-radius: 5px;
+  color: var(--link-hover);
+}
+
+.post-content pre {
+  background-color: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 18px;
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+.post-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--ink-2);
+}
+
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.post-content th,
+.post-content td {
+  border: 1px solid var(--line);
+  padding: 11px 15px;
+  text-align: left;
+}
+
+.post-content th {
+  background-color: var(--card-2);
+  color: var(--ink-3);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.post-content strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.post-content img {
+  max-width: 100%;
+  border-radius: var(--r-sm);
+}
+
+/* ==================== Charts ==================== */
+.chart-group {
+  margin: 1.5rem 0;
+}
+
+.charts-container {
+  position: relative;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 1rem;
+  padding-top: 3rem;
+}
+
+.chart-scale-toggle {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  z-index: 10 !important;
+
+  display: flex !important;
+  gap: 2px !important;
+
+  background: var(--card) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-sm) !important;
+  padding: 3px !important;
+  margin: 0 !important;
+
+  box-shadow: var(--shadow) !important;
+}
+
+.chart-scale-toggle .toggle-option {
+  padding: 5px 11px !important;
+  font-size: 12px !important;
+  font-family: var(--font-mono) !important;
+  color: var(--ink-4) !important;
+  cursor: pointer !important;
+  transition: all 0.15s !important;
+  user-select: none !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 4px !important;
+  margin: 0 !important;
+  text-decoration: none !important;
+}
+
+.chart-scale-toggle .toggle-option:hover {
+  color: var(--ink-2) !important;
+  background: var(--hover) !important;
+}
+
+.chart-scale-toggle .toggle-option.active {
+  color: var(--ink) !important;
+  background: var(--active-bg) !important;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.chart-wrapper {
+  min-height: 200px;
+}
+
+.chart-error {
+  color: #c0392b;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* ==================== References ====================
+   `.ref` / `.ref .tooltip` are also declared in each post's inline
+   <style>; those blocks load after this file, so the overrides below
+   are given extra specificity rather than relying on order. */
+.ref-cite,
+.post-content .ref,
+.post-content a.ref {
+  display: inline-block;
+  color: var(--link);
+  background: color-mix(in srgb, var(--link) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--link) 26%, transparent);
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  vertical-align: baseline;
+}
+
+.ref-cite:hover,
+.post-content .ref:hover,
+.post-content a.ref:hover {
+  color: var(--card);
+  background: var(--link);
+  border-color: var(--link);
+}
+
+.ref-tooltip,
+.post-content .ref .tooltip {
+  position: fixed;
+  z-index: 10000;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--r-sm);
+  padding: 11px 15px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--card);
+  max-width: 400px;
+  box-shadow: var(--shadow-raised);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s;
+}
+
+.ref-tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==================== Responsive ==================== */
+/* Narrower gutter — pull the overhang in rather than off-screen */
+@media (max-width: 900px) {
+  .main {
+    padding: 44px 28px 72px;
+  }
+
+  .about {
+    --avatar-size: 126px;
+    --avatar-out: 18px;
+    --avatar-up: 24px;
+    padding: 26px;
+    padding-left: calc(var(--avatar-size) - var(--avatar-out) + 24px);
+  }
+
+  .post-page {
+    padding: 32px 26px;
+  }
+}
+
+@media (max-width: 700px) {
+  body {
+    font-size: 15.5px;
+  }
+
+  .navigator {
+    padding: 0 16px;
+    gap: 2px;
+  }
+
+  .nav-brand {
+    font-size: 15px;
+  }
+
+  .nav-link {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .nav-section + .nav-section {
+    margin-left: 6px;
+    padding-left: 6px;
+  }
+
+  /* Too narrow to overhang. The photo moves inside the card and floats to
+     the right, level with the name, so the header reads as a balanced pair
+     rather than a stack. Floating (not absolute) means the bio wraps
+     alongside it and then reclaims full width once past its bottom edge. */
+  .about {
+    padding: 26px 22px;
+    padding-left: 22px;
+  }
+
+  .avatar {
+    position: static;
+    float: right;
+    width: 104px;
+    height: 104px;
+    margin: 2px 0 16px 18px;
+    font-size: 32px;
+  }
+
+  /* Contain the float — a short bio must not let it escape the card */
+  .about::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  .name {
+    font-size: 26px;
+  }
+
+  .post {
+    padding: 20px;
+  }
+
+  .post:hover {
+    padding: 20px;
+  }
+
+  /* Thumbnail stays beside the title rather than stacking above it — same
+     reasoning as the avatar: side by side reads more balanced when narrow. */
+  .post-thumb {
+    width: 138px;
+    height: 138px;
+    margin: 0 0 12px 14px;
+  }
+
+  .post-page {
+    padding: 26px 20px;
+  }
+
+  .post-page-title {
+    font-size: 25px;
+  }
+
+  .links {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .nav-icon {
+    display: none;
+  }
+
+  .nav-link span:not(.nav-icon) {
+    font-size: 13.5px;
+  }
+
+  /* Keep enough room beside the photo for the name to stay on one line */
+  .avatar {
+    width: 88px;
+    height: 88px;
+    margin-left: 14px;
+    font-size: 28px;
+  }
+
+  .name {
+    font-size: 23px;
+  }
+
+  .post-thumb {
+    width: 114px;
+    height: 114px;
+  }
+
+  /* No room for the "image" chip at this size — the hatch reads on its own */
+  .post-thumb:empty::after {
+    content: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .post:hover,
+  .links a:hover,
+  .post-links a:hover {
+    transform: none;
+  }
+}
+
+/* =============================================================
+   Per-theme structural overrides
+   ============================================================= */
+
+/* --- grid: graph-paper field, monospace metadata, flat cards --- */
+[data-theme="grid"] body {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+}
+
+[data-theme="grid"] .posts-list {
+  gap: 10px;
+}
+
+[data-theme="grid"] .post:hover {
+  transform: none;
+  border-color: var(--ink-3);
+}
+
+[data-theme="grid"] .post-title {
+  letter-spacing: -0.005em;
+}
+
+[data-theme="grid"] .post-tag {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  border: 1px solid var(--line);
+  background: var(--card-2);
+}
+
+[data-theme="grid"] .label::before,
+[data-theme="grid"] .posts-header::before {
+  border-radius: 0;
+}
+
+[data-theme="grid"] .links a {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* --- soft: borderless, pillowy, roomy --- */
+[data-theme="soft"] .posts-list {
+  gap: 18px;
+}
+
+[data-theme="soft"] .about,
+[data-theme="soft"] .post,
+[data-theme="soft"] .post-page {
+  border-color: transparent;
+}
+
+[data-theme="soft"] .post:hover {
+  transform: translateY(-3px);
+}
+
+[data-theme="soft"] .footer {
+  border-top: none;
+}
+
+[data-theme="soft"] .avatar {
+  border-color: transparent;
+  background: var(--card-2);
+}
+
+[data-theme="soft"] .links a {
+  border-color: transparent;
+  border-radius: var(--r-pill);
+}
+
+[data-theme="soft"] .history-btn {
+  border-color: transparent;
+  background: var(--chip);
+}
+
+[data-theme="soft"] .blog-disclaimer {
+  border: none;
+  border-left: 3px solid var(--link);
+  border-radius: var(--r-sm);
+}
+
+/* --- slate family (slate, warm, clay): denser, crisper, square markers ---
+   These three share one geometry and differ only in palette temperature,
+   so every structural override applies to all of them. */
+[data-theme="slate"] .posts-list,
+[data-theme="warm"] .posts-list,
+[data-theme="clay"] .posts-list {
+  gap: 8px;
+}
+
+[data-theme="slate"] .post,
+[data-theme="warm"] .post,
+[data-theme="clay"] .post {
+  padding: 18px 20px;
+}
+
+[data-theme="slate"] .post:hover,
+[data-theme="warm"] .post:hover,
+[data-theme="clay"] .post:hover {
+  padding: 18px 20px;
+  transform: none;
+  border-color: var(--link);
+}
+
+[data-theme="slate"] .post-title,
+[data-theme="warm"] .post-title,
+[data-theme="clay"] .post-title {
+  font-size: 17.5px;
+}
+
+[data-theme="slate"] .label::before,
+[data-theme="slate"] .posts-header::before,
+[data-theme="warm"] .label::before,
+[data-theme="warm"] .posts-header::before,
+[data-theme="clay"] .label::before,
+[data-theme="clay"] .posts-header::before {
+  border-radius: 1px;
+}
+
+/* Avatar sizing is deliberately NOT overridden per theme: the responsive
+   rules set --avatar-* on `.about` (specificity 0,1,0), so a
+   `[data-theme=x] .about` override (0,2,0) would beat them at every
+   breakpoint and defeat the mobile shrink. */
+
+/* --- paper: editorial serif for body copy in long-form posts --- */
+[data-theme="paper"] .post-content,
+:root:not([data-theme]) .post-content {
+  font-size: 16.5px;
+}
+
+[data-theme="paper"] .post-summary,
+:root:not([data-theme]) .post-summary {
+  color: var(--ink-2);
+}
+
+/* ---- neu: the big blocks ---- */
+
+/* The avatar is extruded like the cards rather than outlined. */
+[data-theme="neu"] .avatar {
+  border: none;
+  box-shadow: var(--shadow);
+}
+
+/* Hovering lifts the block: the same light source, thrown further. */
+/* No hover state on the cards. A card is not a control — nothing happens
+   when it is clicked, and the links in its foot are what respond. Lifting it
+   under the pointer promised an action it does not have. This overrides the
+   lift, the deeper shadow and the heading tint that the base rules apply. */
+[data-theme="neu"] .post:hover {
+  transform: none;
+  box-shadow: var(--shadow);
+  border-color: transparent;
+}
+
+[data-theme="neu"] .post:hover .post-title {
+  color: var(--ink);
+}
+
+/* A tag is pressed into the field instead of sitting on it — the inset pair
+   is the same two shadows with their offsets reversed. */
+[data-theme="neu"] .post-tag {
+  background: var(--bg);
+  border: none;
+  box-shadow: inset 2px 2px 5px #c9d0da, inset -2px -2px 5px #fdfeff;
+}
+
+/* The link pills keep the slate treatment: white fill, real contrast. Under
+   neumorphism proper they would be field-coloured too, and then nothing on
+   the card would look clickable. */
+[data-theme="neu"] .post-links a {
+  background: #ffffff;
+  border: none;
+  box-shadow: 4px 4px 9px #c9d0da, -4px -4px 9px #fdfeff;
+}
+
+[data-theme="neu"] .post-links a:hover {
+  background: var(--link);
+  box-shadow: 4px 4px 9px #c9d0da, -4px -4px 9px #fdfeff;
+}
+
+/* Inert pill: pressed in, so it reads as part of the surface. */
+[data-theme="neu"] .post-links .link-pending {
+  background: var(--bg);
+  border: none;
+  box-shadow: inset 3px 3px 6px #c9d0da, inset -3px -3px 6px #fdfeff;
+}
+
+[data-theme="neu"] .footer {
+  border-top: none;
+}
+
+/* ---- neu: one continuous silhouette for the About block ----
+
+   The photo and the social buttons are positioned outside the card's box but
+   overlap it (the photo juts --avatar-out past the left edge, the buttons sit
+   in the same column). Giving each its own shadow draws them as three separate
+   objects sitting on a fourth. Instead: every piece is filled with the page
+   colour and carries no shadow of its own, and the shadow pair is applied once
+   to the section as a `filter: drop-shadow`, which traces the alpha outline of
+   the whole subtree. The result is a single extruded shape whose edge runs
+   around the card, up over the photo and down the buttons.
+
+   drop-shadow, not box-shadow: box-shadow follows each element's own border
+   box, so it would draw the seams the fill is hiding. Nothing moves and no
+   corner is squared: the photo and each button already overlap the card's left
+   edge, so each is joined to it on its own and the union stays one connected
+   region. The gaps between them become concavities in that outline, which is
+   what makes the extrusion irregular rather than a rounded rectangle. */
+[data-theme="neu"] .about {
+  background: var(--bg);
+  border: none;
+  box-shadow: none;
+  filter:
+    drop-shadow(8px 8px 13px #c5ccd7)
+    drop-shadow(-8px -8px 13px #fbfdff);
+}
+
+[data-theme="neu"] .avatar {
+  background: var(--bg);
+  border: none;
+  box-shadow: none;
+}
+
+/* ---- neu: the column gets its own space beside the card ----
+
+   The card's left edge moves right by the width of the photo column; its
+   right edge does not move, so the text measure shortens and the photo and
+   buttons sit beside the text rather than over it. The column stands clear
+   of the card by --column-gap, so the two are separate extrusions sharing
+   one light source; set that to 0 or below and they fuse back into a
+   single irregular shape. */
+@media (min-width: 861px) {
+  [data-theme="neu"] .about {
+    /* The column is anchored to the layout's left edge and the card starts
+       one column-width in, so this is the whole distance between them. A
+       positive value is a real gap, and the two are then separate
+       extrusions; at 0 they touch, and below 0 the column runs under the
+       card and the union is a single irregular shape. */
+    --column-gap: 24px;
+
+    margin-left: calc(var(--avatar-size) + var(--column-gap));
+    /* Nothing overhangs the text any more, so the card's own padding stands. */
+    padding-left: var(--pad-card);
+
+    min-height: calc(
+      var(--avatar-size) + 18px + 3 * 39px + 2 * 8px + var(--pad-card)
+    );
+  }
+
+  /* Anchored to the layout's left edge, not to the card's. */
+  [data-theme="neu"] .avatar {
+    left: calc(-1 * (var(--avatar-size) + var(--column-gap)));
+    top: 0;
+  }
+
+  [data-theme="neu"] .links {
+    left: calc(-1 * (var(--avatar-size) + var(--column-gap)));
+    top: calc(var(--avatar-size) + 18px);
+  }
+}
+
+/* Part of the silhouette only while the buttons are in the column. Below
+   861px they rejoin the text flow as a row, and a shape they are not part of
+   cannot carry their shadow — so there they are extruded on their own. */
+@media (min-width: 861px) {
+  [data-theme="neu"] .links a {
+    background: var(--bg);
+    border: none;
+    box-shadow: none;
+  }
+
+  /* Hover cannot lift a button out of a shape it is part of; tint it. */
+  [data-theme="neu"] .links a:hover {
+    transform: none;
+    background: var(--bg-2);
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 860px) {
+  [data-theme="neu"] .links a {
+    background: var(--bg);
+    border: none;
+    box-shadow: 4px 4px 9px #c9d0da, -4px -4px 9px #fdfeff;
+  }
+
+  [data-theme="neu"] .links a:hover {
+    transform: none;
+    box-shadow: inset 3px 3px 6px #c9d0da, inset -3px -3px 6px #fdfeff;
+  }
+}
+
+/* ---- neu: the top bar ----
+   A full-width bar has no left or right edge to catch the light, so only the
+   lower shadow reads. The inner highlight along the top gives it the second
+   face and keeps the same light source as the cards. The blur is dropped: a
+   backdrop filter samples the page behind it and greys the extrusion. */
+[data-theme="neu"] .navigator {
+  background: var(--bg);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-bottom: none;
+  box-shadow:
+    0 6px 14px #cdd4de,
+    inset 0 1px 0 #fbfdff;
+}
+
+/* The bar's controls behave like keys. At rest they are flush with the bar
+   and carry no shadow; under the pointer the key rises out of it; the one
+   that is already selected stays pressed in, and pressing any of them pushes
+   it in for as long as the mouse is down. A flat tint on hover said nothing
+   about depth, which is what made the bar feel unlike the rest of the page. */
+[data-theme="neu"] .nav-link {
+  background: transparent;
+  box-shadow: none;
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+[data-theme="neu"] .nav-link:hover {
+  background: var(--bg);
+  box-shadow: 3px 3px 7px #c9d0da, -3px -3px 7px #fdfeff;
+}
+
+[data-theme="neu"] .nav-link:active,
+[data-theme="neu"] .nav-link.active {
+  background: var(--bg);
+  box-shadow: inset 2px 2px 5px #c9d0da, inset -2px -2px 5px #fdfeff;
+}
+
+/* The selected key is already in; hovering it must not pull it back out. */
+[data-theme="neu"] .nav-link.active:hover {
+  box-shadow: inset 2px 2px 5px #c9d0da, inset -2px -2px 5px #fdfeff;
+}
+
+[data-theme="neu"] .history-btn {
+  border: none;
+  background: var(--bg);
+  box-shadow: 3px 3px 7px #c9d0da, -3px -3px 7px #fdfeff;
+}
+
+[data-theme="neu"] .history-btn:hover:not(:disabled) {
+  box-shadow: inset 3px 3px 6px #c9d0da, inset -3px -3px 6px #fdfeff;
+}
+
+/* The divider between bar groups is a drawn line on a surface that has none. */
+[data-theme="neu"] .nav-section + .nav-section {
+  border-left: none;
+}
+
+/* ---- neu: a machined edge inside the extruded one ----
+
+   Media only. The photo and each thumbnail keep the soft extruded edge that
+   every other block has, and a hard metallic ring runs around the image right
+   at that edge. The soft edge says the block is part of the surface; the hard
+   one says the image is a thing set into it, the way a lens sits in a housing.
+   --bezel insets the ring from the outer edge; at 0 the two meet.
+
+   The ring is a conic gradient, not a solid colour: metal reads as metal
+   because the highlight travels round the rim, bright where the light hits
+   and dark on the opposite face. The gradient fills the whole box and a
+   two-layer mask (border-box minus content-box) erases everything but the
+   0.75px rim, which is the only way to put a gradient on a border and keep the
+   corner radius. */
+[data-theme="neu"] .avatar,
+[data-theme="neu"] .post-thumb:not(:empty) {
+  --bezel: 0px;
+
+  padding: var(--bezel);
+  background: var(--bg);
+}
+
+/* No `position` here: .avatar is already absolutely positioned against the
+   card, and restating it as relative drops it back into the text flow and
+   moves it. The thumbnail has no position of its own, so it needs one for the
+   ring to be placed against. */
+[data-theme="neu"] .post-thumb:not(:empty) {
+  position: relative;
+  border: none;
+  box-shadow: 5px 5px 11px #c9d0da, -5px -5px 11px #fdfeff;
+}
+
+[data-theme="neu"] .avatar::after,
+[data-theme="neu"] .post-thumb:not(:empty)::after {
+  content: "";
+  position: absolute;
+  inset: var(--bezel);
+  padding: 0.75px;
+
+  background: conic-gradient(
+    from 218deg,
+    #ffffff,
+    #97a3b3 11%,
+    #f4f7fb 25%,
+    #7d899a 41%,
+    #ffffff 54%,
+    #a6b1c0 69%,
+    #eff4f9 83%,
+    #ffffff
+  );
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+          mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+/* The ring's radius, and the media's, are the outer radius less the gap, so
+   the two curves stay concentric instead of drifting apart at the corners. */
+[data-theme="neu"] .avatar::after,
+[data-theme="neu"] .avatar img {
+  border-radius: calc(var(--r-lg) - var(--bezel));
+}
+
+[data-theme="neu"] .post-thumb:not(:empty)::after,
+[data-theme="neu"] .post-thumb img,
+[data-theme="neu"] .post-thumb video {
+  border-radius: calc(var(--r-sm) - var(--bezel));
+}
+
+/* ==================== Video overlay ====================
+   Theme-independent: a video opened from a card plays over the page instead
+   of replacing it. The backdrop is dark in every theme, since the point is to
+   take the page's light away from the footage. */
+.video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+
+  /* Above the fixed bar (1000) and the mobile menu (10000); the overlay is
+     modal, so nothing the page owns may sit over it. */
+  background: rgba(14, 17, 21, 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.video-overlay-frame {
+  position: relative;
+  max-width: min(1100px, 100%);
+  max-height: 100%;
+}
+
+.video-overlay video {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 48px);
+  border-radius: var(--r);
+  background: #000;
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* Outside the frame's top-right corner on a wide screen, and tucked inside it
+   when the viewport is too narrow for the button to sit clear of the video. */
+.video-overlay-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 21px;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.video-overlay-close:hover {
+  background: var(--card-2);
+}
+
+.video-overlay-close:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .video-overlay-close {
+    top: 8px;
+    right: 8px;
+  }
+}
+
+/* ==================== Marks in links ====================
+   Two kinds. A pill-icon is a glyph we draw, filled with currentColor, so it
+   takes the link's ink and inverts with it on hover. A brand-mark is someone
+   else's logo, which owns its colours and must not be recoloured — so a link
+   carrying one keeps its light field on hover instead of inverting, or the
+   logo would sit on a jade ground it was never drawn for. */
+.pill-icon {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+  fill: currentColor;
+}
+
+.brand-mark {
+  height: 14px;
+  width: auto;
+  flex: 0 0 auto;
+  display: block;
+}
+
+/* The arXiv logo is a wordmark: it carries the name, so no text follows it,
+   and it is set slightly larger to read at the same weight as the labels
+   beside it. */
+.brand-mark-arxiv {
+  height: 15px;
+}
+
+.post-links a.brand-link:hover {
+  color: var(--link-hover);
+  background: var(--card);
+  border-color: var(--line-strong);
+}
+
+[data-theme="neu"] .post-links a.brand-link:hover {
+  background: #ffffff;
+  color: var(--link-hover);
+}
+
+/* The social buttons hold a glyph and a label. Centring the pair would put
+   each button's glyph at a different x, because the labels differ in width
+   (Email against LinkedIn). A fixed first column instead: every glyph lands
+   on one vertical line and every label starts on another. */
+.links a {
+  display: grid;
+  /* Both tracks fixed, so the glyph column and the label column are the same
+     width in every button; centring the pair then lands all three on the same
+     two vertical lines. A 1fr label column would stretch to the button and
+     push the block left, which is what centred-and-aligned has to avoid.
+     The label track is the width of the longest label, LinkedIn. */
+  grid-template-columns: 14px var(--social-label, 56px);
+  justify-content: center;
+  align-items: center;
+  justify-items: start;
+  gap: 9px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.links a .pill-icon {
+  justify-self: center;
+}

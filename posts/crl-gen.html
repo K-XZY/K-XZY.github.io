@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="neu">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Testing the limits of contrastive RL as an unsupervised demonstrator, and distilling what it learns into a vision-based policy.">
+  <title>CRL-Gen | Kevin Xie</title>
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://k-xzy.github.io/posts/crl-gen.html">
+  <meta property="og:title" content="CRL-Gen: Can unsupervised RL act as a universal demonstrator?">
+  <meta property="og:description"
+    content="Testing the limits of contrastive RL as an unsupervised demonstrator, and distilling what it learns into a vision-based policy.">
+  <meta property="article:published_time" content="2026-06-09">
+  <meta property="article:author" content="Kevin Xie">
+  <meta property="article:tag" content="contrastive-rl">
+  <meta property="article:tag" content="reinforcement-learning">
+  <meta property="article:tag" content="multi-arm-manipulation">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CRL-Gen: Can unsupervised RL act as a universal demonstrator?">
+  <meta name="twitter:description"
+    content="Testing the limits of contrastive RL as an unsupervised demonstrator.">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/me-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/me-180.png">
+  <link rel="stylesheet" href="../css/style-v2.css?v=41">
+  <style>
+    /* The outer card keeps the neumorphic field: it is extruded out of the
+       page by the two shadows. Everything INSIDE it is a plain academic
+       page — paper, hairlines, no shadows — because a soft field is hard to
+       read long text off. */
+
+    /* ---- width ----------------------------------------------------------
+       The page runs wider than the site default so figures, clips and the
+       evidence cards get room; running text keeps its own measure so lines
+       do not get long to read. */
+    body {
+      --measure: 1240px;
+      --read: 100%;
+      --paper: #fbfcfd;
+      --rule: #d7dde5;
+      --rule-strong: #b7c0cb;
+    }
+
+    /* The sheet the article is printed on. */
+    .post-page {
+      background: var(--paper);
+    }
+
+    /* Phone and small tablet: the sheet stops floating. It runs to both screen
+       edges and keeps the same paper colour it has on a desktop — the whole
+       viewport becomes that paper. The light no longer falls on a raised card;
+       it falls in from the screen edges, so the page reads as a surface curving
+       away at the bezel. Breakpoint is an iPad mini in portrait. */
+    @media (max-width: 820px) {
+
+      html,
+      body,
+      .layout {
+        background: var(--paper);
+      }
+
+      .main {
+        max-width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+        padding-bottom: 0;
+      }
+
+      .post-page {
+        margin: 0;
+        border-radius: 0;
+        background: var(--paper);
+        box-shadow: none;
+        padding: 26px 20px 56px;
+      }
+
+      /* the shadow is cast by the screen edge itself, so it is fixed to the
+         viewport and stays put while the page scrolls under it */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 60;
+        box-shadow:
+          inset 20px 22px 34px -4px rgba(122, 137, 158, 0.72),
+          inset -20px -22px 34px -4px rgba(255, 255, 255, 0.95);
+      }
+
+      /* nothing inside floats on top of that surface */
+      .evidence,
+      details.impl,
+      .post-page .post-tag {
+        background: transparent;
+      }
+
+      .navigator {
+        background: var(--paper);
+      }
+    }
+
+    /* Site chrome that sits on the sheet loses the field treatment too. */
+    .post-page .post-tag {
+      background: transparent;
+      border: 1px solid var(--rule);
+      box-shadow: none;
+      color: var(--ink-3);
+    }
+
+    .post-page-header {
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .post-content>p,
+    .post-content>ul,
+    .post-content>ol,
+    .post-content>.todo,
+    .post-content>.question,
+    .post-content>.eqn {
+      max-width: var(--read);
+    }
+
+    /* Two evidence blocks sit side by side once there is room for them. */
+    .ev-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      margin: 1.6rem 0;
+    }
+
+    .ev-grid .evidence {
+      margin: 0;
+    }
+
+    @media (max-width: 900px) {
+      .ev-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .post-content h3 {
+      font-size: 1.22rem;
+    }
+
+    /* ---- the research question, set apart by a rule, not a shadow ---- */
+    .question {
+      background: transparent;
+      border-left: 3px solid var(--accent);
+      padding: 0.2rem 0 0.2rem 1.1rem;
+      margin: 1.8rem 0;
+    }
+
+    .question p {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--ink);
+    }
+
+    /* ---- evidence lists: the numbers we hold, for the prose to draw on ---- */
+    .evidence {
+      background: transparent;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      padding: 1rem 1.2rem 1.1rem;
+      margin: 1.4rem 0;
+    }
+
+    .evidence .ev-head {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: var(--ink-3);
+      margin-bottom: 0.7rem;
+    }
+
+    .evidence ul {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+
+    .evidence li {
+      margin: 0.35rem 0;
+      line-height: 1.5;
+    }
+
+    .evidence li.src {
+      list-style: none;
+      margin-left: -1.1rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--ink-4);
+    }
+
+    /* ---- figures ---- */
+    figure {
+      margin: 2.2rem 0;
+    }
+
+    /* A plot does not gain from being 1200 px wide: its type just grows.
+       Charts keep a fixed measure and centre in the wider column. */
+    figure.chart .fig-body {
+      max-width: 880px;
+      margin-inline: auto;
+    }
+
+    figure.chart figcaption {
+      max-width: 880px;
+      margin-inline: auto;
+    }
+
+    figure .fig-body {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    figure svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    figcaption {
+      font-size: 0.84rem;
+      line-height: 1.5;
+      color: var(--ink-3);
+      margin-top: 0.8rem;
+    }
+
+    figcaption[data-num]::before {
+      content: "Figure " attr(data-num) ". ";
+      color: var(--ink-2);
+      font-weight: 500;
+    }
+
+    /* ---- the row of setting clips ---- */
+    .strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .strip video {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      background: #eef1f5;
+    }
+
+    .strip .clip-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: var(--ink-3);
+      margin-bottom: 0.4rem;
+    }
+
+    .strip .clip-note {
+      font-size: 0.78rem;
+      color: var(--ink-3);
+      margin-top: 0.4rem;
+      line-height: 1.35;
+    }
+
+    /* one clip on its own: keep it at its natural scale, not stretched */
+    figure.single .fig-body {
+      max-width: 560px;
+      margin-inline: auto;
+    }
+
+    figure.single video {
+      width: 100%;
+      display: block;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+    }
+
+    figure.single figcaption {
+      max-width: 560px;
+      margin-inline: auto;
+    }
+
+    .strip.strip-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* A single figure sits beside its paragraph instead of leaving the right
+       half of the page empty. Strips and chart pairs still run full width. */
+    .pair {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: 36px;
+      align-items: center;
+      margin: 1.6rem 0;
+    }
+
+    .pair>figure {
+      margin: 0;
+    }
+
+    .pair .strip,
+    .pair .strip.strip-2,
+    .pair .strip.strip-3 {
+      gap: 8px;
+      max-width: none;
+    }
+
+    /* a lone clip beside short text: cap its height so the row closes up */
+    /* full frames only: a clip is scaled down whole, never cropped. The figure
+       block still spans the column, so its caption keeps the column's edges. */
+    a.cite {
+      white-space: nowrap;
+    }
+
+    .post-content ol {
+      margin: 0.6rem 0 1.2rem;
+      padding-left: 1.3rem;
+    }
+
+    .post-content ol li {
+      margin: 0.45rem 0;
+      line-height: 1.55;
+    }
+
+    .pair figure.single video {
+      max-height: 240px;
+      max-width: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+      margin-inline: auto;
+    }
+
+    /* short paragraph, wide grid: narrow the figure column instead */
+    .pair .clip-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.02em;
+    }
+
+    .pair>.pair-text>p:first-child {
+      margin-top: 0;
+    }
+
+    .pair>.pair-text>p {
+      max-width: none;
+    }
+
+    .pair figure.single .fig-body,
+    .pair figure.single figcaption {
+      max-width: none;
+      margin-inline: 0;
+    }
+
+    @media (max-width: 900px) {
+      .pair {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .charts-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .charts-2 svg,
+    svg.legend {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    svg.legend {
+      margin-top: 2px;
+      max-width: 660px;
+      margin-inline: auto;
+    }
+
+    /* A single figure sits beside its paragraph instead of leaving the right
+       half of the page empty. Strips and chart pairs still run full width. */
+    .pair {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: 36px;
+      align-items: center;
+      margin: 1.6rem 0;
+    }
+
+    .pair>figure {
+      margin: 0;
+    }
+
+    .pair .strip,
+    .pair .strip.strip-2,
+    .pair .strip.strip-3 {
+      gap: 8px;
+      max-width: none;
+    }
+
+    /* a lone clip beside short text: cap its height so the row closes up */
+    /* full frames only: a clip is scaled down whole, never cropped. The figure
+       block still spans the column, so its caption keeps the column's edges. */
+    a.cite {
+      white-space: nowrap;
+    }
+
+    .post-content ol {
+      margin: 0.6rem 0 1.2rem;
+      padding-left: 1.3rem;
+    }
+
+    .post-content ol li {
+      margin: 0.45rem 0;
+      line-height: 1.55;
+    }
+
+    .pair figure.single video {
+      max-height: 240px;
+      max-width: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+      margin-inline: auto;
+    }
+
+    /* short paragraph, wide grid: narrow the figure column instead */
+    .pair .clip-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.02em;
+    }
+
+    .pair>.pair-text>p:first-child {
+      margin-top: 0;
+    }
+
+    .pair>.pair-text>p {
+      max-width: none;
+    }
+
+    .pair figure.single .fig-body,
+    .pair figure.single figcaption {
+      max-width: none;
+      margin-inline: 0;
+    }
+
+    @media (max-width: 900px) {
+      .pair {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .strip.strip-2 {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 760px;
+    }
+
+    /* a lone clip outside a pair keeps its own scale */
+    figure.single .fig-body,
+    figure.single figcaption {
+      max-width: 560px;
+      margin-inline: auto;
+    }
+
+    figure.single video {
+      width: 100%;
+      display: block;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+    }
+
+    @media (max-width: 1000px) {
+
+      .strip,
+      .strip.strip-3 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+
+      .strip,
+      .strip.strip-2,
+      .strip.strip-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .charts-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .charts-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---- the settings, side by side ---- */
+    .clips {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .clips video {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      box-shadow: none;
+      background: #eef1f5;
+    }
+
+    .clips .clip-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: var(--ink-3);
+      margin-bottom: 0.45rem;
+    }
+
+    @media (max-width: 620px) {
+      .clips {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---- numbered displayed equation ---- */
+    .post-content {
+      counter-reset: eqc;
+    }
+
+    .eqn {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      counter-increment: eqc;
+      margin: 1.1rem 0;
+    }
+
+    .eqn .eqn-body {
+      text-align: center;
+      font-size: 1.02rem;
+    }
+
+    .eqn::after {
+      content: "(" counter(eqc) ")";
+      color: var(--ink-4);
+      font-size: 0.85rem;
+    }
+
+    /* ---- collapsed implementation block ---- */
+    details.impl {
+      background: transparent;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      padding: 0.8rem 1.1rem;
+      margin: 1.6rem 0;
+      font-size: 0.9rem;
+      max-width: var(--read);
+    }
+
+    details.impl>summary {
+      cursor: pointer;
+      list-style: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: var(--ink-3);
+    }
+
+    details.impl>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.impl>summary::after {
+      content: " \25B8 show";
+    }
+
+    details.impl[open]>summary::after {
+      content: " \25BE hide";
+    }
+  </style>
+</head>
+
+<body class="lang-en">
+  <!-- Nav injected by components.js. Outside .layout on purpose: .layout
+       is the scroller, and a scroller rubber-bands whatever it contains. -->
+  <div id="nav-root"></div>
+  <div class="layout">
+
+    <main class="main">
+      <article class="post-page">
+        <header class="post-page-header">
+          <h1 class="post-page-title">CRL-Gen: Can unsupervised RL act as a universal demonstrator?</h1>
+          <div class="post-page-meta">June 2026</div>
+        </header>
+
+        <div class="post-content">
+
+          <h2>Introduction: Exploring an alternative, supervision free source of training data</h2>
+
+          <p>Vision policies and Vision Language Action Models rely on human demonstration to learn to solve a task.
+            While having its merits, this seems like a finite pool of data. This work aims to explore an alternative
+            source of data and way of learning.</p>
+
+          <p>Unsupervised reinforcement learning, specifically Goal-conditioned RL methods such as Contrastive RL,
+            has demonstrated some capabilities to learn through interacting with the world. We adopt Contrastive RL
+            (CRL) and its variants, applying them on embodiments and tasks unseen in prior literature, with the aim
+            to understand its limitations.</p>
+
+          <figure>
+            <div class="fig-body">
+              <div class="strip">
+                <div>
+                  <div class="clip-label">Pose agnostic</div>
+                  <video src="../assets/crl-gen/pose.mp4" poster="../assets/crl-gen/pose-poster.jpg" autoplay loop muted
+                    playsinline preload="metadata"
+                    aria-label="A Franka arm faces a square nut and a peg spawned at different positions and orientations across episodes"></video>
+                  <div class="clip-note">varying object pose</div>
+                </div>
+                <div>
+                  <div class="clip-label">Multi-arm</div>
+                  <video src="../assets/crl-gen/arms.mp4" poster="../assets/crl-gen/arms-poster.jpg" autoplay loop muted
+                    playsinline preload="metadata"
+                    aria-label="Three clips in sequence: one Franka arm inserting a peg, a two-armed OpenArm relaying a box, three SO-101 arms relaying a cube"></video>
+                  <div class="clip-note">one arm, two arms, three arms</div>
+                </div>
+                <div>
+                  <div class="clip-label">Objects</div>
+                  <video src="../assets/crl-gen/objects.mp4" poster="../assets/crl-gen/objects-poster.jpg" autoplay loop
+                    muted playsinline preload="metadata"
+                    aria-label="Three clips in sequence: a Franka moving one square nut onto a peg, a two-armed robot handling two boxes, and a Franka putting an object into a drawer"></video>
+                  <div class="clip-note">single object, multi-object</div>
+                </div>
+                <div>
+                  <div class="clip-label">Emergent behaviour</div>
+                  <video src="../assets/crl-gen/emergent.mp4" poster="../assets/crl-gen/emergent-poster.jpg" autoplay
+                    loop muted playsinline preload="metadata"
+                    aria-label="Three clips in sequence: a Franka nudging a square nut onto a peg with its wrist, a two-armed robot pressing a box to flip it, and a two-armed robot flipping and tossing a box"></video>
+                  <div class="clip-note">wrist nudge, press-flip, toss</div>
+                </div>
+                <div>
+                  <div class="clip-label">Vision policy</div>
+                  <video src="../assets/crl-gen/vision.mp4" poster="../assets/crl-gen/vision-poster.jpg" autoplay loop
+                    muted playsinline preload="metadata"
+                    aria-label="An SO-101 arm pushing a cube, with the 84 pixel camera image the policy reads inset"></video>
+                  <div class="clip-note">rendered views the policy reads</div>
+                </div>
+              </div>
+            </div>
+            <figcaption data-num="1">The settings this work covers: object poses vary every episode, arm count goes from one to three, tasks hold one or more objects, behaviours emerge that nobody demonstrated, and the generated data trains a vision policy.</figcaption>
+            <!-- Tile sources live in ../assets/crl-gen-assets/, one folder per tile;
+                 ../assets/crl-gen/ holds only the built 480x300 clips this page loads.
+                 See ../assets/crl-gen-assets/README.md for provenance. -->
+          </figure>
+
+          <h2>How well does Online-CRL handle different object poses?</h2>
+
+
+          <div class="pair">
+            <div class="pair-text">
+          <p>For simple tasks, such as push or pick and place, CRL worked very well.</p>
+
+          <p>However, training one policy for just one scene is pretty expensive. What if we can randomise some
+            parts of the scene, provide that information (e.g. the object pose of a fixed object) to the model, and
+            let it learn to solve variations of the same task? Specifically for the square insertion task, we want
+            to randomise not just the pose of the square peg (which can be moved by the arm), but also the rods
+            (yellow and white) for each episode. Note that these rods cannot be moved by force; they are mounted to
+            the table.</p>
+            </div>
+          <figure class="single">
+            <div class="fig-body">
+              <video src="../assets/crl-gen/pose.mp4" poster="../assets/crl-gen/pose-poster.jpg" autoplay loop muted
+                playsinline preload="metadata"
+                aria-label="Square insertion resets: the square peg and both rods take a different pose every episode"></video>
+            </div>
+            <figcaption data-num="2">Every episode of the square insertion task starts with the peg and both rods in a new pose.</figcaption>
+          </figure>
+          </div>
+
+
+          <figure>
+            <div class="fig-body">
+              <div class="charts-2">
+                <svg viewBox="0 0 660 300" role="img" aria-label="Episode success against environment steps: baseline CRL stays at zero while both CRTR runs rise">
+                <g font-family="Avenir Next, Avenir, sans-serif" font-size="12" fill="#616b78">
+                  <line x1="78" y1="30" x2="78" y2="236" stroke="#b3bcc8" stroke-width="1"></line>
+                  <line x1="78" y1="236" x2="636" y2="236" stroke="#b3bcc8" stroke-width="1"></line>
+                  <text x="78" y="18" font-size="13" text-anchor="start" fill="#1b1f24">Episode success</text>
+                  <text x="20" y="133" font-size="12" text-anchor="middle" transform="rotate(-90 20 133)">success &#8593;</text>
+                  <line x1="73" y1="236.0" x2="78" y2="236.0" stroke="#b3bcc8"></line>
+                  <text x="69" y="240.0" font-size="11.5" text-anchor="end">0</text>
+                  <line x1="73" y1="198.5" x2="78" y2="198.5" stroke="#b3bcc8"></line>
+                  <text x="69" y="202.5" font-size="11.5" text-anchor="end">0.1</text>
+                  <line x1="73" y1="161.1" x2="78" y2="161.1" stroke="#b3bcc8"></line>
+                  <text x="69" y="165.1" font-size="11.5" text-anchor="end">0.2</text>
+                  <line x1="73" y1="123.6" x2="78" y2="123.6" stroke="#b3bcc8"></line>
+                  <text x="69" y="127.6" font-size="11.5" text-anchor="end">0.3</text>
+                  <line x1="73" y1="86.2" x2="78" y2="86.2" stroke="#b3bcc8"></line>
+                  <text x="69" y="90.2" font-size="11.5" text-anchor="end">0.4</text>
+                  <line x1="73" y1="48.7" x2="78" y2="48.7" stroke="#b3bcc8"></line>
+                  <text x="69" y="52.7" font-size="11.5" text-anchor="end">0.5</text>
+                  <line x1="78.0" y1="236" x2="78.0" y2="241" stroke="#b3bcc8"></line>
+                  <text x="78.0" y="256" font-size="11.5" text-anchor="middle">0</text>
+                  <line x1="301.2" y1="236" x2="301.2" y2="241" stroke="#b3bcc8"></line>
+                  <text x="301.2" y="256" font-size="11.5" text-anchor="middle">1M</text>
+                  <line x1="524.4" y1="236" x2="524.4" y2="241" stroke="#b3bcc8"></line>
+                  <text x="524.4" y="256" font-size="11.5" text-anchor="middle">2M</text>
+                  <line x1="636.0" y1="236" x2="636.0" y2="241" stroke="#b3bcc8"></line>
+                  <text x="636.0" y="256" font-size="11.5" text-anchor="middle">2.5M</text>
+                  <text x="357" y="276" font-size="12" text-anchor="middle">environment steps</text>
+                  <polyline points="78.0,233.8 80.9,233.9 83.5,234.0 86.5,234.1 89.4,234.1 92.3,234.2 95.0,234.3 98.2,234.4 101.1,234.5 103.7,234.6 106.7,234.7 109.6,234.8 112.5,234.9 115.4,234.9 118.0,235.1 121.2,235.1 123.9,235.0 126.8,235.0 129.7,235.0 132.6,235.0 135.4,235.0 138.3,234.9 141.1,235.0 144.2,235.0 147.1,235.0 150.0,234.9 152.6,234.9 155.5,234.9 158.4,234.9 161.4,234.9 164.2,234.9 167.3,234.8 170.0,234.8 172.8,234.7 175.7,234.7 178.6,234.7 181.5,234.7 184.4,234.7 187.5,234.7 190.4,234.6 193.0,234.6 195.9,234.6 198.7,234.6" fill="none" stroke="#fca5a5" stroke-width="2" stroke-linejoin="round"></polyline>
+                  <polyline points="78.0,233.9 83.7,233.7 89.3,233.5 95.1,233.0 101.0,232.6 106.7,232.1 112.3,231.7 118.0,231.1 123.9,230.0 129.8,229.4 135.5,228.6 141.1,227.6 147.0,226.3 152.6,225.2 158.4,224.4 164.2,223.3 170.0,222.3 175.7,221.5 181.5,220.0 187.4,218.5 193.2,217.4 198.7,215.5 204.6,213.9 210.3,213.0 216.2,211.3 221.8,210.1 227.5,208.3 233.3,206.1 239.1,202.6 244.9,200.2 250.5,197.8 256.6,196.3 262.1,192.1 268.0,187.5 273.7,183.0 279.5,176.2 285.3,171.3 290.9,167.4 296.6,164.1 302.6,161.7 308.2,159.6 313.9,156.6 319.6,154.6 325.5,153.6 331.3,152.9 337.1,152.5 342.6,152.8 348.6,155.9 354.4,153.0 360.1,152.5 365.9,150.3 371.6,147.7 377.4,144.0 383.1,142.2 389.0,138.4 394.7,133.3 400.3,131.4 406.1,130.0 412.0,127.2 417.8,124.1 423.3,124.2 429.1,119.6 435.0,119.1 440.7,118.5 446.5,117.5 452.1,117.6 458.0,117.1 463.8,117.5 469.6,112.8 475.3,110.3 481.1,110.6 486.9,110.2 492.6,110.2 498.2,112.3 504.0,107.0 509.8,106.0 515.6,107.0 521.2,107.7 527.2,107.9 533.0,108.2 538.7,111.2 544.6,108.2 550.2,108.2 555.9,107.9 561.6,109.0 567.4,107.8 573.1,109.2 579.1,106.8 584.6,107.2 590.7,107.7 596.2,108.1 602.1,108.7 607.6,109.4 613.5,117.0" fill="none" stroke="#5eead4" stroke-width="2" stroke-linejoin="round"></polyline>
+                  <polyline points="78.0,233.8 81.5,234.0 85.1,234.4 88.7,234.6 93.2,234.9 96.9,234.9 100.4,235.1 104.0,235.2 108.5,234.9 112.0,234.8 115.6,234.4 119.3,234.1 123.8,233.2 127.3,231.8 130.9,230.3 135.4,228.4 138.9,226.8 142.6,225.2 146.0,223.7 150.6,222.9 154.2,222.4 157.7,222.2 161.4,221.3 165.8,221.3 169.4,221.2 172.9,221.1 176.6,220.9 181.1,220.4 184.7,219.8 188.2,219.6 192.8,218.5 196.4,217.7 199.9,216.4 203.5,215.5 208.0,214.4 211.6,212.8 215.2,211.0 218.7,209.5 223.2,207.9 226.7,206.8 230.5,205.7 234.0,205.1 238.4,205.0 242.0,204.6 245.7,203.8 250.1,202.3 253.7,200.8 257.3,198.9 260.8,194.0 265.4,182.3 269.0,168.8 272.5,152.4 276.0,136.8 280.5,120.1 284.1,110.4 287.8,102.7 291.3,95.3 295.8,96.7 299.3,96.4 303.0,95.6 307.5,94.0 311.1,94.8 314.6,95.8 318.2,93.4 322.8,91.3 326.3,88.6 329.9,88.4 333.5,86.2 337.9,83.8 341.6,85.5 345.2,85.8 349.7,83.7 353.2,81.1 356.8,75.7 360.3,76.6 364.9,68.1 368.5,66.6 371.9,67.1 375.6,64.5 380.0,62.3 383.7,62.2 387.3,56.5 390.8,54.4 395.2,52.3 399.0,52.8 402.5,53.2 407.0,50.4 410.5,49.0 414.2,46.0 417.8,42.8 422.1,41.1 425.9,42.1 429.4,44.7 433.0,45.7 437.4,47.5 441.0,47.2 444.6,47.1 448.2,46.9 452.8,45.2 456.3,47.7 459.9,43.8 464.3,45.0 467.9,43.5 471.5,41.8 475.1,41.6 479.5,42.8 483.2,40.8 486.8,42.1 490.3,43.2 494.9,44.8 498.4,47.0 502.0,46.7 505.6,49.5 510.0,46.5 513.6,47.3 517.2,47.5 521.7,45.9 525.4,45.8 528.9,48.5 532.5,48.6" fill="none" stroke="#f0b429" stroke-width="2" stroke-linejoin="round"></polyline>
+                </g>
+              </svg>
+                <svg viewBox="0 0 660 300" role="img" aria-label="Critic loss against environment steps on a log axis: baseline falls lowest while both CRTR runs settle higher">
+                <g font-family="Avenir Next, Avenir, sans-serif" font-size="12" fill="#616b78">
+                  <line x1="78" y1="30" x2="78" y2="236" stroke="#b3bcc8" stroke-width="1"></line>
+                  <line x1="78" y1="236" x2="636" y2="236" stroke="#b3bcc8" stroke-width="1"></line>
+                  <text x="78" y="18" font-size="13" text-anchor="start" fill="#1b1f24">Critic loss</text>
+                  <text x="20" y="133" font-size="12" text-anchor="middle" transform="rotate(-90 20 133)">loss, log &#8595;</text>
+                  <line x1="73" y1="213.5" x2="78" y2="213.5" stroke="#b3bcc8"></line>
+                  <text x="69" y="217.5" font-size="11.5" text-anchor="end">0.5</text>
+                  <line x1="73" y1="182.9" x2="78" y2="182.9" stroke="#b3bcc8"></line>
+                  <text x="69" y="186.9" font-size="11.5" text-anchor="end">1</text>
+                  <line x1="73" y1="152.3" x2="78" y2="152.3" stroke="#b3bcc8"></line>
+                  <text x="69" y="156.3" font-size="11.5" text-anchor="end">2</text>
+                  <line x1="73" y1="111.9" x2="78" y2="111.9" stroke="#b3bcc8"></line>
+                  <text x="69" y="115.9" font-size="11.5" text-anchor="end">5</text>
+                  <line x1="73" y1="81.3" x2="78" y2="81.3" stroke="#b3bcc8"></line>
+                  <text x="69" y="85.3" font-size="11.5" text-anchor="end">10</text>
+                  <line x1="73" y1="32.8" x2="78" y2="32.8" stroke="#b3bcc8"></line>
+                  <text x="69" y="36.8" font-size="11.5" text-anchor="end">30</text>
+                  <line x1="78.0" y1="236" x2="78.0" y2="241" stroke="#b3bcc8"></line>
+                  <text x="78.0" y="256" font-size="11.5" text-anchor="middle">0</text>
+                  <line x1="301.2" y1="236" x2="301.2" y2="241" stroke="#b3bcc8"></line>
+                  <text x="301.2" y="256" font-size="11.5" text-anchor="middle">1M</text>
+                  <line x1="524.4" y1="236" x2="524.4" y2="241" stroke="#b3bcc8"></line>
+                  <text x="524.4" y="256" font-size="11.5" text-anchor="middle">2M</text>
+                  <line x1="636.0" y1="236" x2="636.0" y2="241" stroke="#b3bcc8"></line>
+                  <text x="636.0" y="256" font-size="11.5" text-anchor="middle">2.5M</text>
+                  <text x="357" y="276" font-size="12" text-anchor="middle">environment steps</text>
+                  <polyline points="78.0,115.2 80.9,118.3 83.5,121.6 86.5,125.2 89.4,129.1 92.3,133.5 95.0,138.2 98.2,143.6 101.1,149.7 103.7,156.8 106.7,165.3 109.6,175.8 112.5,189.5 115.4,209.6 118.0,212.0 121.2,213.3 123.9,213.9 126.8,214.3 129.7,214.6 132.6,214.9 135.4,215.2 138.3,215.4 141.1,215.6 144.2,215.6 147.1,215.7 150.0,215.7 152.6,215.8 155.5,215.8 158.4,215.8 161.4,215.9 164.2,215.9 167.3,216.0 170.0,216.1 172.8,216.2 175.7,216.3 178.6,216.3 181.5,216.5 184.4,216.6 187.5,216.7 190.4,216.8 193.0,216.9 195.9,217.1 198.7,217.2" fill="none" stroke="#fca5a5" stroke-width="2" stroke-linejoin="round"></polyline>
+                  <polyline points="78.0,112.9 83.7,118.6 89.3,125.0 95.1,132.4 101.0,141.2 106.7,152.1 112.3,166.6 118.0,176.6 123.9,176.2 129.8,175.4 135.5,174.4 141.1,173.4 147.0,172.3 152.6,171.2 158.4,170.2 164.2,169.4 170.0,168.8 175.7,168.1 181.5,167.5 187.4,166.9 193.2,166.2 198.7,165.7 204.6,165.2 210.3,165.1 216.2,164.7 221.8,164.3 227.5,164.0 233.3,163.7 239.1,163.3 244.9,163.1 250.5,163.1 256.6,163.0 262.1,163.1 268.0,163.1 273.7,163.0 279.5,162.6 285.3,162.4 290.9,162.1 296.6,162.1 302.6,162.2 308.2,162.5 313.9,162.7 319.6,162.8 325.5,162.7 331.3,162.9 337.1,162.8 342.6,162.8 348.6,162.9 354.4,163.0 360.1,163.2 365.9,163.1 371.6,163.3 377.4,163.2 383.1,162.9 389.0,162.8 394.7,162.7 400.3,162.7 406.1,162.6 412.0,162.6 417.8,162.5 423.3,162.4 429.1,162.4 435.0,162.3 440.7,162.3 446.5,162.2 452.1,162.3 458.0,162.4 463.8,162.4 469.6,162.4 475.3,162.3 481.1,162.4 486.9,162.3 492.6,162.3 498.2,162.2 504.0,162.2 509.8,162.1 515.6,161.9 521.2,161.8 527.2,161.8 533.0,161.6 538.7,161.8 544.6,161.6 550.2,161.5 555.9,161.5 561.6,161.3 567.4,161.3 573.1,161.4 579.1,161.4 584.6,161.4 590.7,161.6 596.2,161.7 602.1,161.8 607.6,161.8 613.5,161.9" fill="none" stroke="#5eead4" stroke-width="2" stroke-linejoin="round"></polyline>
+                  <polyline points="78.0,33.3 81.5,48.5 85.1,71.9 88.7,124.6 93.2,164.4 96.9,165.0 100.4,165.3 104.0,165.5 108.5,165.7 112.0,165.6 115.6,165.1 119.3,164.3 123.8,162.8 127.3,161.1 130.9,159.1 135.4,156.7 138.9,155.3 142.6,154.1 146.0,153.2 150.6,152.8 154.2,152.8 157.7,152.7 161.4,152.5 165.8,152.4 169.4,152.3 172.9,152.4 176.6,152.5 181.1,152.4 184.7,152.3 188.2,152.2 192.8,152.0 196.4,151.8 199.9,151.6 203.5,151.7 208.0,151.7 211.6,151.6 215.2,151.2 218.7,150.7 223.2,150.0 226.7,149.5 230.5,149.0 234.0,148.7 238.4,148.8 242.0,148.4 245.7,147.9 250.1,147.9 253.7,148.3 257.3,148.7 260.8,149.1 265.4,150.0 269.0,150.6 272.5,150.8 276.0,151.0 280.5,151.5 284.1,152.1 287.8,152.9 291.3,153.7 295.8,154.5 299.3,154.8 303.0,155.2 307.5,155.3 311.1,155.1 314.6,155.2 318.2,155.3 322.8,155.0 326.3,154.8 329.9,154.7 333.5,154.7 337.9,154.7 341.6,154.7 345.2,154.8 349.7,155.0 353.2,155.0 356.8,154.9 360.3,154.6 364.9,154.5 368.5,154.4 371.9,154.3 375.6,154.3 380.0,154.6 383.7,154.9 387.3,154.9 390.8,154.8 395.2,154.7 399.0,154.8 402.5,154.7 407.0,154.6 410.5,154.7 414.2,154.6 417.8,154.6 422.1,154.7 425.9,154.8 429.4,154.9 433.0,155.1 437.4,155.3 441.0,155.1 444.6,154.9 448.2,154.8 452.8,154.8 456.3,154.8 459.9,154.7 464.3,154.7 467.9,154.8 471.5,154.8 475.1,154.8 479.5,154.8 483.2,154.9 486.8,155.0 490.3,155.1 494.9,155.3 498.4,155.6 502.0,155.8 505.6,156.1 510.0,156.2 513.6,156.1 517.2,156.1 521.7,156.0 525.4,155.8 528.9,155.7 532.5,155.6" fill="none" stroke="#f0b429" stroke-width="2" stroke-linejoin="round"></polyline>
+                </g>
+              </svg>
+              </div>
+              <svg viewBox="0 0 660 24" role="img" aria-label="Legend" class="legend">
+                <g font-family="Avenir Next, Avenir, sans-serif" fill="#616b78">
+                  <rect x="40" y="10" width="20" height="3" fill="#fca5a5"></rect> <text x="67" y="15" font-size="12">baseline CRL (d=16)</text> <rect x="205" y="10" width="20" height="3" fill="#5eead4"></rect> <text x="232" y="15" font-size="12">+ CRTR R=2 (d=16)</text> <rect x="357" y="10" width="20" height="3" fill="#f0b429"></rect> <text x="384" y="15" font-size="12">+ CRTR R=2 (d=64, bs=2048)</text>
+                </g>
+              </svg>
+            </div>
+            <figcaption data-num="3">Square insertion with randomised rods: the baseline drives its critic loss
+              lowest of the three yet never solves the task, while both CRTR runs keep a higher loss and reach 32%
+              and 50% success.</figcaption>
+          </figure>
+
+          <p>The critic loss panel is where the shortcut shows. The baseline drives its loss down to 0.46, lower
+            than either CRTR run reaches, while its success stays at 0.004 — the objective is being minimised by
+            something other than solving the task. Both CRTR runs settle at a higher loss, 1.6 and 1.9, and turn it
+            into 32% and 50% success.</p>
+
+          <p>Turns out, these features that only change across each batch and do not change within an episode
+            provide a shortcut to the contrastive objective. We found prior work <a class="cite" href="https://arxiv.org/abs/2508.13113" target="_blank" rel="noopener">(2025, Ziarko, CRTR)</a> to face a similar issue in
+            the offline setting; adopting their method mitigates the problem and improved performance, but does not
+            fully solve the task. Scaling the model with CRTR&nbsp;=&nbsp;2 seems to help.</p>
+
+          <h2>Does CRL scale to multi-arm manipulation?</h2>
+
+          <figure>
+            <div class="fig-body">
+              <div class="strip">
+                <div>
+                  <div class="clip-label">22 cm</div>
+                  <video src="../assets/crl-gen/push-1.mp4" poster="../assets/crl-gen/push-1-poster.jpg"
+                    autoplay loop muted playsinline preload="metadata" aria-label="A two-armed OpenArm pushing a box across the table to its goal"></video>
+                </div>
+                <div>
+                  <div class="clip-label">39 cm</div>
+                  <video src="../assets/crl-gen/push-2.mp4" poster="../assets/crl-gen/push-2-poster.jpg"
+                    autoplay loop muted playsinline preload="metadata" aria-label="A two-armed OpenArm pushing a box across the table to its goal"></video>
+                </div>
+                <div>
+                  <div class="clip-label">60 cm</div>
+                  <video src="../assets/crl-gen/push-3.mp4" poster="../assets/crl-gen/push-3-poster.jpg"
+                    autoplay loop muted playsinline preload="metadata" aria-label="A two-armed OpenArm pushing a box across the table to its goal"></video>
+                </div>
+                <div>
+                  <div class="clip-label">76 cm</div>
+                  <video src="../assets/crl-gen/push-4.mp4" poster="../assets/crl-gen/push-4-poster.jpg"
+                    autoplay loop muted playsinline preload="metadata" aria-label="A two-armed OpenArm pushing a box across the table to its goal"></video>
+                </div>
+                <div>
+                  <div class="clip-label">89 cm</div>
+                  <video src="../assets/crl-gen/push-5.mp4" poster="../assets/crl-gen/push-5-poster.jpg"
+                    autoplay loop muted playsinline preload="metadata" aria-label="A two-armed OpenArm pushing a box across the table to its goal"></video>
+                </div>
+              </div>
+            </div>
+            <figcaption data-num="4">Five bimanual pushes, labelled by how far the box has to travel.</figcaption>
+          </figure>
+
+
+
+          <div class="pair">
+            <div class="pair-text">
+          <p>We started the work with a Franka arm, then tried it using an OpenArm (bimanual), and then we made a
+            very long table with three SO-101s placed to cover each section of the table. When there is just one
+            single object, CRL seems to work pretty well at passing that object to a given position.</p>
+
+          <p>Notice that while CRL can discover solutions to these problems, it seems to include lots of redundant
+            movements in the robot's motion. This is exacerbated when we work with the SO-101.</p>
+            </div>
+          <figure>
+            <div class="fig-body">
+              <div class="strip strip-2">
+                <div>
+                  <div class="clip-label">All three arms</div>
+                  <video src="../assets/crl-gen/relay-white-1.mp4"
+                    poster="../assets/crl-gen/relay-white-1-poster.jpg" autoplay loop muted playsinline
+                    preload="metadata"
+                    aria-label="Three SO-101 arms relaying a cube along a long table, each arm taking its section"></video>
+                </div>
+                <div>
+                  <div class="clip-label">Two arms used</div>
+                  <video src="../assets/crl-gen/relay-white-2.mp4"
+                    poster="../assets/crl-gen/relay-white-2-poster.jpg" autoplay loop muted playsinline
+                    preload="metadata"
+                    aria-label="The same task solved with only two of the three arms acting"></video>
+                </div>
+              </div>
+            </div>
+            <figcaption data-num="5">The three-arm relay, once with all three arms acting and once with only two.</figcaption>
+          </figure>
+          </div>
+
+
+
+
+
+
+          <h2>What if we have more than one object?</h2>
+
+          <div class="pair narrow">
+            <div class="pair-text">
+          <p>This is where we start seeing CRL struggle. See the following tasks:</p>
+
+          <p>CRL was only able to handle the square task. For mug cleanup, it fails to explore opening the drawer
+            and then picking and placing the mug. We include all free objects (objects that can move) as state
+            input.</p>
+            </div>
+          <figure>
+            <div class="fig-body">
+              <div class="strip strip-3">
+                <div>
+                  <div class="clip-label">Square</div>
+                  <video src="../assets/crl-gen/resets-square.mp4" poster="../assets/crl-gen/resets-square-poster.jpg"
+                    autoplay loop muted playsinline preload="metadata"
+                    aria-label="Square task reset distribution"></video>
+                </div>
+                <div>
+                  <div class="clip-label">Threading</div>
+                  <video src="../assets/crl-gen/resets-threading.mp4"
+                    poster="../assets/crl-gen/resets-threading-poster.jpg" autoplay loop muted playsinline
+                    preload="metadata" aria-label="Threading task reset distribution"></video>
+                </div>
+                <div>
+                  <div class="clip-label">Mug cleanup</div>
+                  <video src="../assets/crl-gen/resets-drawer.mp4" poster="../assets/crl-gen/resets-drawer-poster.jpg"
+                    autoplay loop muted playsinline preload="metadata"
+                    aria-label="Mug cleanup task reset distribution, with a drawer and a mug"></video>
+                </div>
+              </div>
+            </div>
+            <figcaption data-num="6">What the robot faces at the start of an episode in each of the three tasks.</figcaption>
+          </figure>
+          </div>
+
+
+
+          <div class="pair short-fig">
+            <div class="pair-text">
+          <p>Another interesting finding is that for a single-arm robot, CRL could not learn to handle two objects.
+            We recorded contact frequency to each object and found that it would prefer one over another. We later
+            read <a class="cite" href="https://arxiv.org/abs/2410.20092" target="_blank" rel="noopener">(2024, Park, OGBench)</a> and found that even in an offline setting, when multiple objects (i.e. the goal
+            space consists of multiple objects' poses) are involved, CRL gives worse performance the more objects
+            there are.</p>
+
+          <p>Our intuition is that CRL might be bad at exploring the environment and lack the combinatorial prior.
+            More objects lead to a combinatorially more complex search space. In addition to that, the horizon of
+            state-action transitions to a goal is also longer, as while the robot moves, its goal state remains
+            stationary (e.g. reaching to open a drawer while the mug remains untouched).</p>
+            </div>
+            <figure class="single">
+              <div class="fig-body">
+                <video src="../assets/crl-gen/two-boxes.mp4" poster="../assets/crl-gen/two-boxes-poster.jpg" autoplay
+                  loop muted playsinline preload="metadata"
+                  aria-label="A two-armed OpenArm moving two boxes at once, one with each arm"></video>
+              </div>
+              <figcaption data-num="7">The second piece of evidence: with two arms the robot moves both boxes at
+                once instead of choosing between them.</figcaption>
+            </figure>
+          </div>
+
+
+          <p>Three pieces of evidence support the exploration and horizon hypothesis. First, when the goal space is
+            the end-effector pose of the OpenArm, the robot thus receives dense goal space variations, and reached
+            near perfect success online. Second, when the OpenArm is given two objects to push, unlike the Franka
+            which has to prioritise one over another, it can simply move both at the same time, reaching a high
+            success rate too. Finally, another work <a class="cite" href="https://openreview.net/forum?id=knI0KISsbw" target="_blank" rel="noopener">(2026, Yan, SHCRL)</a> studied this more thoroughly and published on 21 July 2026,
+            that, when the actor can simply move the cube through "telekinesis", i.e. random action leads to dense
+            goal variation, the model learned to handle multiple objects (though still capping at 4 to 5
+            objects).</p>
+
+          <h2>We found that CRL could discover many interesting behaviours</h2>
+
+          <div class="pair">
+            <div class="pair-text">
+          <p>Without the human prior, CRL can learn interesting behaviours such as nudging with its own wrist, using
+            a part of the robot that isn't the end-effector. Running with a different seed also leads to the policy
+            converging at different behaviours. For instance, some runs lead to tossing behaviour via grasping,
+            while some learned reliable tossing without even grasping the object!</p>
+            </div>
+          <figure>
+            <div class="fig-body">
+              <div class="strip strip-3">
+                <div>
+                  <div class="clip-label">Wrist nudge</div>
+                  <video src="../assets/crl-gen/wrist-nudge.mp4" poster="../assets/crl-gen/wrist-nudge-poster.jpg"
+                    autoplay loop muted playsinline preload="metadata"
+                    aria-label="A Franka nudging the square nut onto the peg with the side of its wrist"></video>
+                </div>
+                <div>
+                  <div class="clip-label">Press-flip</div>
+                  <video src="../assets/crl-gen/toss-press-flip.mp4"
+                    poster="../assets/crl-gen/toss-press-flip-poster.jpg" autoplay loop muted playsinline
+                    preload="metadata" aria-label="A two-armed robot pressing a box to flip it over"></video>
+                </div>
+                <div>
+                  <div class="clip-label">Flip and toss</div>
+                  <video src="../assets/crl-gen/toss-flip.mp4" poster="../assets/crl-gen/toss-flip-poster.jpg"
+                    autoplay loop muted playsinline preload="metadata"
+                    aria-label="A two-armed robot flipping and tossing a box"></video>
+                </div>
+              </div>
+            </div>
+            <figcaption data-num="8">Three behaviours CRL found on its own: nudging with the wrist, pressing a box over, and tossing it.</figcaption>
+          </figure>
+          </div>
+
+
+
+          <p>The quality of the simulation also plays a significant role in the learned policy. The actor would
+            discover physically unrealistic movements when the simulation permits it.</p>
+
+
+          <h2>Limitation and future work</h2>
+
+          <p>I haven't had a chance to port over more results, so expect this page to be updated in the future.</p>
+
+          <p>There are a few issues that stand between CRL and real world deployment, as a demonstrator should
+            manage:</p>
+
+          <ol>
+            <li>While being able to produce novel behaviours, some movements are too aggressive or redundant, which
+              adds strain on real machines.</li>
+            <li>The observation space is misaligned between CRL and the downstream Vision Action Model; some skills
+              don't seem learnable for the VA.</li>
+            <li>The current range of tasks CRL can do is still limited to short horizon, i.e. it can't yet compete
+              with human demos, or LLM driven discovery methods <a class="cite" href="https://arxiv.org/abs/2607.00272" target="_blank" rel="noopener">(2026, Lu, ASPIRE)</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- Footer injected by components.js -->
+      <div id="footer-root"></div>
+    </main>
+  </div>
+
+  <script src="../js/components.js?v=6"></script>
+  <script>
+    // Chrome pauses muted autoplay clips that leave the viewport, and a resize
+    // can leave them paused once the layout settles. Nudge them back.
+    (function () {
+      'use strict';
+      var vids = Array.prototype.slice.call(document.querySelectorAll('video'));
+      function play(v) { var p = v.play(); if (p && p.catch) p.catch(function () { }); }
+
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) play(e.target);
+          });
+        }, { rootMargin: '300px' });
+        vids.forEach(function (v) { io.observe(v); });
+      }
+
+      vids.forEach(function (v) {
+        v.addEventListener('pause', function () {
+          if (document.visibilityState === 'visible' && !v.ended) play(v);
+        });
+      });
+
+      var t;
+      window.addEventListener('resize', function () {
+        clearTimeout(t);
+        t = setTimeout(function () { vids.forEach(play); }, 200);
+      }, { passive: true });
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') vids.forEach(play);
+      });
+    })();
+  </script>
+
+  <script src="../js/navigation.js?v=2"></script>
+</body>
+
+</html>

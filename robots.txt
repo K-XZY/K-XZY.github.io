@@ -1,0 +1,7 @@
+# robots.txt for k-xzy.github.io
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://k-xzy.github.io/sitemap.xml
