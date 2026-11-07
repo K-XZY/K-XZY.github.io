@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="neu">
+<html lang="en" data-theme="plain">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google-site-verification" content="2qSXE1oFi9MtNpJ4GgMVj9cV7Z1qZ8dFFsh6m63yKLs" />
-  <meta name="description" content="Kevin Xie — researching self-improving learning algorithms at UCL. Working on Vision Language Action Models, Federated and Continual Learning.">
+  <meta name="description" content="Kevin Ziyang Xie — working on the frontier of artificial intelligence and robot learning at UCL.">
   <title>XZY | Personal Website</title>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://k-xzy.github.io/">
   <meta property="og:title" content="Kevin Xie | AI Research">
-  <meta property="og:description" content="Researching self-improving learning algorithms at UCL. Vision Language Action Models, Federated and Continual Learning.">
+  <meta property="og:description" content="Working on the frontier of artificial intelligence and robot learning at UCL.">
 
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/me-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/me-180.png">
-  <link rel="stylesheet" href="css/style-v2.css?v=50">
+  <link rel="stylesheet" href="css/style-v2.css?v=56">
 </head>
 <body>
   <!-- Nav injected by components.js. Outside .layout on purpose: .layout
@@ -31,9 +31,9 @@
         <div class="about-inner">
           <div class="about-content">
             <div class="label">About</div>
-            <h1 class="name" id="profile-name">Kevin (子阳) Xie</h1>
+            <h1 class="name" id="profile-name">Kevin Ziyang Xie</h1>
             <p class="bio" id="profile-bio">I am interested in building learning algorithms that can self-improve from the world’s feedback without human involvement.</p>
-            <p class="bio">My current work is on Federated Vision Language Action Models. This work is supervised by <a href="https://christopherlu.github.io" target="_blank">Chris Lu</a> at <a href="https://christopherlu.github.io/group_website/team/" target="_blank">UCL RoMA Lab</a>.</p>
+            <p class="bio">I’m working on the frontier of artificial intelligence and robot learning, supervised by <a href="https://christopherlu.github.io" target="_blank">Chris Xiaoxuan Lu</a> at <a href="https://christopherlu.github.io/group_website/team/" target="_blank">UCL RoMA Lab</a>, as well as <a href="https://www.dryaseminbekiroglu.com/research" target="_blank" rel="noopener">Yasemin Bekiroglu</a> for my dissertation.</p>
             <p class="bio">I am currently enrolled in the MEng Robotics and AI program at UCL. I was an applied scientist intern at <a href="https://www.microsoft.com/en-us/research/group/msai/" target="_blank">Microsoft</a>. Before that, I worked for <a href="https://www.linear.vc" target="_blank">Linear Capital</a> on outreach and industry analysis.</p>
             <div class="links" id="social-links">
               <a href="https://github.com/K-XZY" target="_blank"><svg class="pill-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
@@ -44,8 +44,8 @@
         </div>
       </section>
 
-      <!-- Card template, shared by both sections below (Publications and
-           Research Projects). Every entry carries a .post-thumb; leave it
+      <!-- Card template for the Projects section below, papers and other work
+           alike. Every entry carries a .post-thumb; leave it
            with nothing between its tags (not even a newline) to show the
            placeholder, or drop an <img> or <video> inside to fill it.
 
@@ -65,8 +65,9 @@
            A status pill is still available if a project ever needs one:
            <div class="post-meta status-ongoing">on-going</div>
       -->
-      <section class="posts-section" id="publications">
-        <div class="posts-header">Publications</div>
+      <!-- One section for all work, newest first: a paper is one kind of project. -->
+      <section class="posts-section" id="projects">
+        <div class="posts-header">Projects</div>
         <div class="posts-list">
           <div class="post">
             <!-- Floats right; must stay first so the text below wraps around it. -->
@@ -83,20 +84,28 @@
               <span class="post-tag">robot-learning</span>
             </div>
             <p class="post-summary">We study federated fine-tuning of three pretrained VLA policies across the 40 simulated tasks of LIBERO and two real-robot deployments of two and three sites, covering the gap to centralized fine-tuning, the choice of federated parameter scope, the aggregation algorithm, robustness under evaluation-time distribution shift, and the cross-site heterogeneity that appears only on physical robots; we release Decent-VLA, the testbed behind the study.</p>
+            <!-- Dated events, oldest first. Their links are the buttons in the foot. -->
+            <ul class="post-timeline">
+              <li>
+                <time datetime="2026-09">Sep 2026</time>
+                <span class="post-timeline-label">Decent-VLA released on arXiv</span>
+              </li>
+              <li>
+                <time datetime="2026-11">Nov 2026</time>
+                <span class="post-timeline-label">Decent-VLA merged into NVIDIA FLARE</span>
+              </li>
+            </ul>
             <div class="post-foot">
               <div class="post-links">
                 <!-- The abstract page rather than the PDF, so the reader can take
-                     the format they want: PDF, HTML or the citation. The arXiv mark
-                     is a wordmark, so it carries the name and no label follows it;
-                     the link's accessible name comes from the img alt. -->
+                the format they want: PDF, HTML or the citation. The arXiv mark
+                is a wordmark, so it carries the name and no label follows it;
+                the link's accessible name comes from the img alt. -->
                 <a href="https://arxiv.org/abs/2609.22973" class="brand-link" target="_blank" rel="noopener">
-                  <img class="brand-mark brand-mark-arxiv" src="assets/icons/arxiv-logo.svg" alt="arXiv" width="247" height="111">
+                <img class="brand-mark brand-mark-arxiv" src="assets/icons/arxiv-logo.svg" alt="arXiv" width="247" height="111">
                 </a>
                 <a href="assets/decent-vla-full.mp4" class="video-link" target="_blank" rel="noopener"><svg class="pill-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3.2a.6.6 0 0 1 .92-.5l7 4.8a.6.6 0 0 1 0 1l-7 4.8A.6.6 0 0 1 5 12.8V3.2z"/></svg>Video</a>
-                <!-- The released testbed's documentation site, with its own mark -->
-                <a href="https://kevinduan1.github.io/decent-vla/" class="brand-link" target="_blank" rel="noopener">
-                  <img class="brand-mark" src="assets/icons/decent-vla-logo.svg" alt="" width="512" height="512">decent-vla
-                </a>
+                <a href="https://github.com/NVIDIA/NVFlare/tree/main/research/decent-vla" target="_blank" rel="noopener"><svg class="pill-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>NVFlare</a>
               </div>
               <div class="post-sponsors" role="group" aria-label="Sponsored by Cisco and NVIDIA">
                 <span class="sponsors-label">Sponsored by</span>
@@ -105,12 +114,6 @@
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section class="posts-section" id="projects">
-        <div class="posts-header">Research Projects</div>
-        <div class="posts-list">
 
           <!-- A <div>, not an <a>: the card carries a link in its foot, and
                nesting <a> inside <a> is invalid HTML. -->
@@ -131,7 +134,7 @@
               <span class="post-tag">reinforcement-learning</span>
               <span class="post-tag">multi-arm-manipulation</span>
             </div>
-            <p class="post-summary">Contrastive RL as a universal demonstrator: goal-conditioned manipulation learned without human demonstration priors, then distilled into VLA models. The same recipe holds across one, two, and three arms. It stopped short of publication because it introduced no new method — and existing CRL cannot explore a space this combinatorial, so long-horizon and multi-object tasks stay out of reach. However, such exploration-driven learning deserves further investigation, as it enables a robot to learn novel manipulation behaviours that use its full body, and does not rely on human data.</p>
+            <p class="post-summary">All systems today (2026) learn from human demos, and we have little control in terms of how much data we can produce or know what kind of data to produce. This was my earlier attempt in building systems that can learn by interacting with the world, with the hope that compute can directly be transferred into capabilities without the intermediate step of manual data collection.</p>
             <div class="post-foot">
               <div class="post-links">
                 <!-- Internal, so no target=_blank &mdash; this also selects the arrow -->
@@ -148,7 +151,7 @@
     </main>
   </div>
 
-  <script src="js/components.js?v=6"></script>
+  <script src="js/components.js?v=8"></script>
   <script src="js/navigation.js?v=2"></script>
   <script src="js/main.js?v=12"></script>
   <script src="js/lightbox.js?v=3"></script>

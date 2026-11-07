@@ -39,16 +39,12 @@
 
     return `
     <nav class="navigator" id="navigator">
-      <a href="${prefix}index.html" class="nav-brand">Kevin Xie</a>
+      <a href="${prefix}index.html" class="nav-brand">XZY</a>
       <div class="nav-section">
         <div class="nav-links">
           <a href="${prefix}index.html" class="nav-link${isHome ? ' active' : ''}" ${isHome ? 'data-section="about"' : ''}>
             <span class="nav-icon">⌂</span>
             <span>Home</span>
-          </a>
-          <a href="${prefix}index.html#publications" class="nav-link">
-            <span class="nav-icon">§</span>
-            <span>Publications</span>
           </a>
           <a href="${prefix}index.html#projects" class="nav-link">
             <span class="nav-icon">✎</span>
